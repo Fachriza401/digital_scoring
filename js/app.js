@@ -71,6 +71,7 @@
     global.IPSI.State.loadState();
     global.IPSI.Sync.init();
     setSyncIndicator();
+    global.addEventListener("ipsi-sync-status", setSyncIndicator);
     wireFullscreenButtons();
 
     var mode = document.body && document.body.dataset.mode;

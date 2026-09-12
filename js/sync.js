@@ -3,6 +3,8 @@
 
   var CHANNEL_NAME = "ipsi_scoring_live";
   var channel = null;
+  var realtimeChannel = null;
+  var realtimeAvailable = false;
   var available = false;
 
   function init() {
@@ -17,6 +19,31 @@
     }
 
     global.addEventListener("storage", onStorageEvent);
+
+    initSupabaseRealtime();
+  }
+
+  function initSupabaseRealtime() {
+    var config = global.IPSI_SUPABASE_CONFIG;
+    var supabaseFactory = global.supabase && global.supabase.createClient;
+    if (!config || !supabaseFactory || !config.url || !config.anonKey || config.anonKey.indexOf("PASTE_") === 0) return;
+    try {
+      var client = supabaseFactory(config.url, config.anonKey);
+      realtimeChannel = client.channel("ipsi-scoring-live-state");
+      realtimeChannel.on("broadcast", { event: "state" }, function (message) {
+        if (message && message.payload && message.payload.state) {
+          global.IPSI.State.applyRemote(message.payload.state, { source: "supabase" });
+        }
+      });
+      realtimeChannel.subscribe(function (status) {
+        realtimeAvailable = status === "SUBSCRIBED";
+        try {
+          global.dispatchEvent(new CustomEvent("ipsi-sync-status", { detail: { online: realtimeAvailable } }));
+        } catch (e) {}
+      });
+    } catch (e) {
+      realtimeAvailable = false;
+    }
   }
 
   function onMessage(event) {
@@ -34,14 +61,17 @@
   }
 
   function broadcast() {
-    if (!available || !channel) return;
-    try {
-      channel.postMessage({ type: "STATE_UPDATE", state: global.IPSI.State.getState() });
-    } catch (e) {}
+    var state = global.IPSI.State.getState();
+    if (available && channel) {
+      try { channel.postMessage({ type: "STATE_UPDATE", state: state }); } catch (e) {}
+    }
+    if (realtimeAvailable && realtimeChannel) {
+      realtimeChannel.send({ type: "broadcast", event: "state", payload: { state: state } }).catch(function () {});
+    }
   }
 
   function isAvailable() {
-    return available;
+    return available || realtimeAvailable;
   }
 
   global.IPSI = global.IPSI || {};
