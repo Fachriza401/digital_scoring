@@ -12,6 +12,7 @@
     var error = document.getElementById("passwordError");
     var label = document.getElementById("passwordJudgeLabel");
     var close = document.getElementById("passwordClose");
+    var toggle = document.getElementById("togglePassword");
     var selectedJudge = null;
     var passwords = {
       judge1: "JURI1-2026",
@@ -31,6 +32,13 @@
     });
 
     if (close) close.addEventListener("click", closeModal);
+    if (toggle) toggle.addEventListener("click", function () {
+      if (!input) return;
+      var visible = input.type === "text";
+      input.type = visible ? "password" : "text";
+      toggle.textContent = visible ? "LIHAT" : "SEMBUNYIKAN";
+      toggle.setAttribute("aria-label", visible ? "Tampilkan password" : "Sembunyikan password");
+    });
     if (modal) modal.addEventListener("click", function (event) {
       if (event.target === modal) closeModal();
     });

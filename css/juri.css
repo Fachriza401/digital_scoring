@@ -312,18 +312,23 @@
   .page-juri .match-timer { font-size:1.8rem; }
 }
 
-/* Android fullscreen focus: keep only the clock and scoring controls prominent. */
-.page-juri.mobile-focus .navbar,
-.page-juri.mobile-focus .match-info-left,
-.page-juri.mobile-focus .match-info-right,
-.page-juri.mobile-focus .match-round-line,
-.page-juri.mobile-focus .corner-head,
-.page-juri.mobile-focus .counters,
-.page-juri.mobile-focus .btn-danger,
-.page-juri.mobile-focus #toastArea { display:none !important; }
+/* Fullscreen focus: remove header copy and leave the clock plus scoring controls. */
+.page-juri.fullscreen-focus .navbar,
+.page-juri.fullscreen-focus .match-info-left,
+.page-juri.fullscreen-focus .match-info-right,
+.page-juri.fullscreen-focus .match-round-line,
+.page-juri.fullscreen-focus .corner-head,
+.page-juri.fullscreen-focus .counters,
+.page-juri.fullscreen-focus .btn-danger,
+.page-juri.fullscreen-focus #toastArea { display:none !important; }
+.page-juri.fullscreen-focus .match-info { display:block; min-height:0; margin:0 0 0.6rem; padding:0; border:0; background:transparent; box-shadow:none; }
+.page-juri.fullscreen-focus .match-info-center { display:block; }
+.page-juri.fullscreen-focus .match-timer { display:block; text-align:center; color:var(--gold-bright); text-shadow:0 0 22px var(--gold-glow); }
+.page-juri.fullscreen-focus .juri-grid { gap:0.6rem; }
+.page-juri.fullscreen-focus .corner-buttons { margin-top:0; }
+.page-juri.fullscreen-focus .juri-center { display:none; }
+
 .page-juri.mobile-focus .juri-main { padding:0.55rem 0.6rem; }
-.page-juri.mobile-focus .match-info { display:block; min-height:0; margin:0 0 0.6rem; padding:0; border:0; background:transparent; box-shadow:none; }
-.page-juri.mobile-focus .match-info-center { display:block; }
 .page-juri.mobile-focus .match-timer { display:block; text-align:center; font-size:2.5rem; color:var(--gold-bright); text-shadow:0 0 22px var(--gold-glow); }
 .page-juri.mobile-focus .juri-grid { gap:0.6rem; }
 .page-juri.mobile-focus .corner { min-height:calc((100vh - 105px) / 2); padding:0.6rem; border-radius:13px; }

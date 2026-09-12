@@ -44,7 +44,9 @@
   }
 
   function updateMobileFullscreenMode() {
-    document.body.classList.toggle("mobile-focus", window.innerWidth <= 600 && !!document.fullscreenElement);
+    var fullscreen = !!document.fullscreenElement;
+    document.body.classList.toggle("fullscreen-focus", fullscreen);
+    document.body.classList.toggle("mobile-focus", window.innerWidth <= 600 && fullscreen);
   }
 
   function bindControls() {

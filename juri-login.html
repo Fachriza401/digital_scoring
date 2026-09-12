@@ -48,7 +48,10 @@
         <h2>MASUKKAN PASSWORD</h2>
         <p>Password diperlukan untuk membuka panel penilaian Juri.</p>
         <label for="judgePassword">PASSWORD JURI</label>
-        <input id="judgePassword" type="password" class="password-input" autocomplete="off" required>
+        <div class="password-field">
+          <input id="judgePassword" type="password" class="password-input" autocomplete="off" required>
+          <button type="button" id="togglePassword" class="password-toggle" aria-label="Tampilkan password">LIHAT</button>
+        </div>
         <div id="passwordError" class="password-error" aria-live="polite"></div>
         <button type="submit" class="password-submit">MASUK PANEL <span>&rarr;</span></button>
       </form>
