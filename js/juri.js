@@ -14,13 +14,20 @@
 
   function init() {
     U = global.IPSI.Utils;
+    var authenticatedJudge = null;
+    try { authenticatedJudge = sessionStorage.getItem("ipsi_judge_session"); } catch (e) {}
+    if (["judge1", "judge2", "judge3"].indexOf(authenticatedJudge) === -1) {
+      window.location.replace("juri-login.html");
+      return;
+    }
+    if (State.getState().judgeActive !== authenticatedJudge) State.actions.setJudge(authenticatedJudge);
     grab([
       "miEventName", "miMatchLine", "miRoundLabel", "miStatus", "miTimer", "miCategory",
       "activeJudgeLabel", "judgeAthleteLabel",
       "blueName", "redName", "blueContingent", "redContingent", "blueDq", "redDq",
       "blueCounters", "redCounters", "blueButtons", "redButtons",
       "btnBluePunch", "btnBlueKick", "btnRedPunch", "btnRedKick",
-      "judgeSelector", "judgeLock", "btnExit",
+      "btnExit",
       "exitModal", "btnExitCancel", "btnExitConfirm"
     ]);
 
@@ -31,6 +38,13 @@
     Timer.startTicker(function (remaining) {
       renderTimerDisplay(remaining);
     });
+
+    updateMobileFullscreenMode();
+    document.addEventListener("fullscreenchange", updateMobileFullscreenMode);
+  }
+
+  function updateMobileFullscreenMode() {
+    document.body.classList.toggle("mobile-focus", window.innerWidth <= 600 && !!document.fullscreenElement);
   }
 
   function bindControls() {
@@ -42,6 +56,7 @@
     if (el.btnExit) el.btnExit.addEventListener("click", function () { if (el.exitModal) el.exitModal.hidden = false; });
     if (el.btnExitCancel) el.btnExitCancel.addEventListener("click", function () { if (el.exitModal) el.exitModal.hidden = true; });
     if (el.btnExitConfirm) el.btnExitConfirm.addEventListener("click", function () {
+      try { sessionStorage.removeItem("ipsi_judge_session"); } catch (e) {}
       location.href = "index.html";
     });
   }
@@ -74,7 +89,6 @@
   function render(state) {
     renderHeader(state);
     renderTeams(state);
-    renderSelector(state);
     renderTimerDisplay(Timer.getDisplayRemaining(state));
   }
 
@@ -139,43 +153,6 @@
   function setCornerLock(teamKey, disqualified, punchBtn, kickBtn) {
     if (punchBtn) punchBtn.disabled = disqualified;
     if (kickBtn) kickBtn.disabled = disqualified;
-  }
-
-  var JUDGE_KEYS = ["judge1", "judge2", "judge3"];
-  var builtSelector = false;
-
-  function renderSelector(state) {
-    if (!el.judgeSelector) return;
-    if (!builtSelector) {
-      builtSelector = true;
-      JUDGE_KEYS.forEach(function (key) {
-        var btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "judge-opt";
-        btn.textContent = "JURI " + key.replace("judge", "");
-        btn.setAttribute("role", "radio");
-        btn.addEventListener("click", function () {
-          State.actions.setJudge(key);
-        });
-        el.judgeSelector.appendChild(btn);
-      });
-    }
-    var running = state.timer.running;
-    var opts = Array.prototype.slice.call(el.judgeSelector.children);
-    opts.forEach(function (btn, i) {
-      var key = JUDGE_KEYS[i];
-      btn.classList.toggle("is-active", state.judgeActive === key);
-      btn.setAttribute("aria-checked", state.judgeActive === key ? "true" : "false");
-      btn.disabled = running;
-    });
-    if (el.judgeLock) {
-      el.judgeLock.hidden = !running;
-      var pill = U.qs(".status-pill", el.judgeLock);
-      if (pill) {
-        pill.className = "status-pill status-" + (running ? "paused" : "ready");
-        pill.textContent = running ? "JURI TERKUNCI" : "JURI SIAP";
-      }
-    }
   }
 
   function renderTimerDisplay(remaining) {

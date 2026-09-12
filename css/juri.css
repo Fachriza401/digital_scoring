@@ -275,4 +275,49 @@
 
 @media (max-width:899px) {
   .page-juri .score-big { min-height:150px; }
+  .page-juri .juri-grid { grid-template-columns:1fr; }
+  .page-juri .corner-buttons { grid-template-columns:1fr; }
+  .page-juri .score-big { min-height:130px; }
+  .page-juri .corner { padding:1rem; }
+}
+
+@media (max-width:600px) {
+  .page-juri .juri-main { padding:0.55rem 0.65rem 1.5rem; }
+  .page-juri .match-info { padding:0.55rem 0.65rem; border-radius:10px; }
+  .page-juri .match-info-left { display:flex; align-items:center; justify-content:center; gap:0.35rem; }
+  .page-juri .match-info-left .mini-label,
+  .page-juri .match-info-left .match-event,
+  .page-juri .match-info-left .match-sub,
+  .page-juri .match-info-right { display:none; }
+  .page-juri .active-judge-label { display:inline-flex; padding:0.35rem 0.7rem; border-radius:999px; background:linear-gradient(90deg,var(--purple),#6b21a8); color:#fff; font-size:0.72rem; font-weight:900; }
+  .page-juri .judge-athlete-label { display:inline-block; color:var(--text-secondary); font-size:0.68rem; }
+  .page-juri .match-info-center { gap:0.1rem; }
+  .page-juri .match-round-line { gap:0.3rem; }
+  .page-juri .match-round { font-size:0.65rem; }
+  .page-juri .match-timer { font-size:1.8rem; }
+}
+
+/* Android fullscreen focus: keep only the clock and scoring controls prominent. */
+.page-juri.mobile-focus .navbar,
+.page-juri.mobile-focus .match-info-left,
+.page-juri.mobile-focus .match-info-right,
+.page-juri.mobile-focus .match-round-line,
+.page-juri.mobile-focus .corner-head,
+.page-juri.mobile-focus .counters,
+.page-juri.mobile-focus .btn-danger,
+.page-juri.mobile-focus #toastArea { display:none !important; }
+.page-juri.mobile-focus .juri-main { padding:0.55rem 0.6rem; }
+.page-juri.mobile-focus .match-info { display:block; min-height:0; margin:0 0 0.6rem; padding:0; border:0; background:transparent; box-shadow:none; }
+.page-juri.mobile-focus .match-info-center { display:block; }
+.page-juri.mobile-focus .match-timer { display:block; text-align:center; font-size:2.5rem; color:var(--gold-bright); text-shadow:0 0 22px var(--gold-glow); }
+.page-juri.mobile-focus .juri-grid { gap:0.6rem; }
+.page-juri.mobile-focus .corner { min-height:calc((100vh - 105px) / 2); padding:0.6rem; border-radius:13px; }
+.page-juri.mobile-focus .corner-buttons { gap:0.5rem; margin-top:0; }
+.page-juri.mobile-focus .score-big { min-height:calc((100vh - 150px) / 4); border-radius:11px; }
+.page-juri.mobile-focus .score-big .sb-label { font-size:1rem; }
+.page-juri.mobile-focus .score-big .sb-value { font-size:1.25rem; }
+@media (orientation:landscape) and (max-width:600px) {
+  .page-juri.mobile-focus .juri-grid { grid-template-columns:1fr 1fr; align-items:stretch; }
+  .page-juri.mobile-focus .corner { min-height:calc(100vh - 65px); }
+  .page-juri.mobile-focus .score-big { min-height:calc((100vh - 105px) / 2); }
 }

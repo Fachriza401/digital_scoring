@@ -43,6 +43,7 @@
         return;
       }
       State.actions.setJudge(selectedJudge);
+      try { sessionStorage.setItem("ipsi_judge_session", selectedJudge); } catch (e) {}
       var activeButton = document.querySelector('[data-judge="' + selectedJudge + '"]');
       if (activeButton) activeButton.classList.add("is-entering");
       if (status) status.textContent = "IDENTITAS DIKONFIRMASI - MEMBUKA PANEL...";
