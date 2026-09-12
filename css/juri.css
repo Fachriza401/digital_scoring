@@ -281,6 +281,21 @@
   .page-juri .corner { padding:1rem; }
 }
 
+/* Landscape phone/tablet: blue stays left, red stays right, actions stack vertically. */
+@media (orientation:landscape) and (min-width:480px) and (max-width:1300px) {
+  .page-juri .juri-main { max-width:none; padding:0.55rem 0.7rem 1rem; }
+  .page-juri .match-info { margin-bottom:0.55rem; }
+  .page-juri .juri-grid { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:0.65rem; }
+  .page-juri .corner { grid-row:auto; min-height:calc(100vh - 125px); padding:0.75rem; }
+  .page-juri .corner-buttons { grid-template-columns:1fr; gap:0.55rem; margin-top:auto; }
+  .page-juri .score-big { min-height:calc((100vh - 205px) / 2); }
+  .page-juri .corner-head { margin-bottom:0.55rem; }
+  .page-juri .counters { flex-direction:row; gap:0.3rem; margin-bottom:0.55rem; }
+  .page-juri .counter { flex:1; min-width:0; padding:0.3rem 0.4rem; font-size:0.6rem; }
+  .page-juri .counter b { font-size:0.8rem; }
+  .page-juri .juri-center { display:none; }
+}
+
 @media (max-width:600px) {
   .page-juri .juri-main { padding:0.55rem 0.65rem 1.5rem; }
   .page-juri .match-info { padding:0.55rem 0.65rem; border-radius:10px; }
