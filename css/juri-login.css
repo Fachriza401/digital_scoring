@@ -1,6 +1,7 @@
 .page-juri-login {
   min-height:100vh;
-  overflow:hidden;
+  overflow-x:hidden;
+  overflow-y:auto;
   background:
     radial-gradient(900px 580px at 50% 32%,rgba(104,27,170,0.28),transparent 65%),
     radial-gradient(600px 420px at 8% 90%,rgba(20,100,255,0.16),transparent 70%),

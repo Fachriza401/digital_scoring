@@ -4,6 +4,8 @@
 
 .page-juri {
   min-height:100vh;
+  overflow-x:hidden;
+  overflow-y:auto;
   background:
     radial-gradient(1200px 500px at 50% -10%,rgba(91,53,168,0.16),transparent 60%),
     var(--bg-primary);
