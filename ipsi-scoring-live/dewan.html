@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#05060a">
+<title>Dewan — IPSI Scoring Live Digital</title>
+<link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+<link rel="stylesheet" href="css/global.css">
+<link rel="stylesheet" href="css/dewan.css">
+</head>
+<body class="page-dewan" data-mode="dewan">
+
+  <nav class="navbar" aria-label="Navigasi utama">
+    <div class="navbar-left">
+      <a class="navbar-back" href="index.html">&larr; Beranda</a>
+      <span class="navbar-brand">IPSI Scoring Live Digital</span>
+      <span class="navbar-status" data-sync-indicator>SYSTEM ONLINE</span>
+      <span class="navbar-user">USER: ADMIN (ADMIN)</span>
+      <span class="navbar-badge">Active: Dewan View</span>
+    </div>
+    <div class="navbar-right">
+      <button type="button" class="btn-fs" data-action="fullscreen">FULLSCREEN</button>
+      <span class="navbar-unlock">SYSTEM UNLOCKED</span>
+    </div>
+  </nav>
+
+  <div id="toastArea" aria-live="polite"></div>
+
+  <main class="dewan-main">
+    <header class="match-info">
+      <div class="match-info-left">
+        <span class="mini-label">EVENT KEJUARAAN</span>
+        <div id="miEventName" class="match-event">KEJUARAAN NASIONAL PENCAK SILAT 2026</div>
+        <div id="miMatchLine" class="match-sub">PARTAI 01 - KELAS A (PUTRA)</div>
+      </div>
+      <div class="match-info-center">
+        <div class="match-round-line">
+          <span id="miRoundLabel" class="match-round">BABAK 1</span>
+          <span id="miStatus" class="status-pill status-ready">READY</span>
+        </div>
+        <div id="miTimer" class="match-timer" role="timer">02:00</div>
+      </div>
+      <div class="match-info-right">
+        <span class="mini-label">KATEGORI PERTANDINGAN</span>
+        <div id="miCategory" class="match-category">TANDING PUTRA - KELAS A</div>
+      </div>
+    </header>
+
+    <section class="timer-bar panel" aria-label="Kontrol timer">
+      <div class="timer-bar-controls">
+        <button type="button" id="btnPlay" class="btn btn-gold" aria-label="Mulai timer">PLAY</button>
+        <button type="button" id="btnPause" class="btn btn-primary" aria-label="Jeda timer">PAUSE</button>
+        <button type="button" id="btnResetTimer" class="btn btn-ghost" aria-label="Reset timer">RESET</button>
+        <button type="button" id="btnSetDuration" class="btn btn-ghost" aria-label="Atur durasi">SET DURATION</button>
+        <div id="roundChips" class="chips" role="group" aria-label="Pilih babak"></div>
+      </div>
+      <div class="timer-track" aria-hidden="true"><div id="timerBar" class="timer-bar"></div></div>
+    </section>
+
+    <section class="dewan-grid">
+      <aside class="team-slot team-slot--blue">
+        <article class="team-panel team-panel--blue">
+          <header class="team-head">
+            <span class="team-dot"></span>
+            <div>
+              <span class="mini-label">SUDUT BIRU</span>
+              <h2 id="blueName" class="team-name">PESILAT BIRU</h2>
+              <span id="blueContingent" class="team-contingent">KONTINGEN BIRU</span>
+            </div>
+            <span id="blueDq" class="dq-badge" hidden>DISK</span>
+          </header>
+          <div id="blueScore" class="team-score team-score--blue" role="status" aria-live="polite">0</div>
+          <div class="team-stats">
+            <span>JATUHAN <strong id="blueFalls">0</strong></span>
+            <span>TEGURAN <strong id="blueWarnings">0</strong></span>
+            <span>PERINGATAN <strong id="bluePenalties">0</strong></span>
+          </div>
+          <div id="blueButtons" class="score-grid"></div>
+        </article>
+
+        <article class="log-panel">
+          <h3 class="log-title">LOG NILAI MASUK (BIRU)</h3>
+          <div id="blueLog" class="log-list" aria-live="polite"></div>
+        </article>
+      </aside>
+
+      <section class="center-slot">
+        <article class="judge-monitor panel">
+          <h2 class="section-heading">MONITOR JURI</h2>
+          <div id="judgePanels" class="judge-panels" aria-label="Panel penilaian juri"></div>
+        </article>
+
+        <article class="verify-panel panel">
+          <h2 class="section-heading">KENDALI VERIFIKASI</h2>
+          <div class="verify-buttons">
+            <button type="button" id="btnVerifyFall" class="btn btn-gold btn-block" aria-label="Verifikasi jatuhan">
+              VERIFIKASI JATUHAN <span id="pendingFallBadge" class="verify-badge">0</span>
+            </button>
+            <button type="button" id="btnVerifyPenalty" class="btn btn-gold btn-block" aria-label="Verifikasi pelanggaran">
+              VERIFIKASI PELANGGARAN <span id="pendingPenaltyBadge" class="verify-badge">0</span>
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <aside class="team-slot team-slot--red">
+        <article class="team-panel team-panel--red">
+          <header class="team-head">
+            <span class="team-dot"></span>
+            <div>
+              <span class="mini-label">SUDUT MERAH</span>
+              <h2 id="redName" class="team-name">PESILAT MERAH</h2>
+              <span id="redContingent" class="team-contingent">KONTINGEN MERAH</span>
+            </div>
+            <span id="redDq" class="dq-badge" hidden>DISK</span>
+          </header>
+          <div id="redScore" class="team-score team-score--red" role="status" aria-live="polite">0</div>
+          <div class="team-stats">
+            <span>JATUHAN <strong id="redFalls">0</strong></span>
+            <span>TEGURAN <strong id="redWarnings">0</strong></span>
+            <span>PERINGATAN <strong id="redPenalties">0</strong></span>
+          </div>
+          <div id="redButtons" class="score-grid"></div>
+        </article>
+
+        <article class="log-panel">
+          <h3 class="log-title">LOG NILAI MASUK (MERAH)</h3>
+          <div id="redLog" class="log-list" aria-live="polite"></div>
+        </article>
+      </aside>
+    </section>
+  </main>
+
+  <div id="resetModal" class="modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+      <h2 id="resetTitle" class="modal-title">RESET PERTANDINGAN?</h2>
+      <p class="modal-text">Seluruh skor, timer, log dan penilaian akan dikembalikan ke kondisi awal.</p>
+      <div class="modal-actions">
+        <button type="button" id="btnResetCancel" class="btn btn-ghost">BATAL</button>
+        <button type="button" id="btnResetConfirm" class="btn btn-danger">RESET</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="durationModal" class="modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="durationTitle">
+      <h2 id="durationTitle" class="modal-title">SET DURATION</h2>
+      <form id="durationForm" autocomplete="off">
+        <div class="dur-inputs">
+          <input type="number" id="durMin" class="input" min="0" max="99" step="1" inputmode="numeric" aria-label="Menit" placeholder="MENIT">
+          <span class="dur-sep">:</span>
+          <input type="number" id="durSec" class="input" min="0" max="59" step="1" inputmode="numeric" aria-label="Detik" placeholder="DETIK">
+        </div>
+        <div class="modal-actions" style="margin-top:0.9rem">
+          <button type="button" id="btnDurationCancel" class="btn btn-ghost">BATAL</button>
+          <button type="submit" class="btn btn-primary">TERAPKAN</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="settingsModal" class="modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <h2 id="settingsTitle" class="modal-title">SYSTEM</h2>
+      <p class="modal-text">Pengaturan lanjutan untuk dewan juri.</p>
+      <div class="modal-actions">
+        <button type="button" id="btnSettingsClose" class="btn btn-ghost">TUTUP</button>
+        <button type="button" id="btnResetMatchShort" class="btn btn-danger">RESET PERTANDINGAN</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/sync.js"></script>
+  <script src="js/dewan.js"></script>
+  <script src="js/juri.js"></script>
+  <script src="js/monitor.js"></script>
+  <script src="js/sekretaris.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

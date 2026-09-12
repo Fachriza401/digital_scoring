@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#08020f">
+<title>Login Juri - IPSI Scoring Live Digital</title>
+<link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+<link rel="stylesheet" href="css/global.css">
+<link rel="stylesheet" href="css/juri-login.css">
+</head>
+<body class="page-juri-login">
+  <main class="judge-login-shell">
+    <div class="judge-login-art art-left" aria-hidden="true"></div>
+    <div class="judge-login-art art-right" aria-hidden="true"></div>
+    <a class="login-back" href="index.html">&larr; KEMBALI KE BERANDA</a>
+
+    <section class="judge-login-panel" aria-labelledby="loginTitle">
+      <div class="login-kicker"><span></span> IPSI SCORING LIVE DIGITAL <span></span></div>
+      <h1 id="loginTitle">PANEL LOGIN JURI</h1>
+      <p class="login-subtitle">Pilih identitas juri untuk bertugas menilai pukulan dan tendangan pertandingan.</p>
+
+      <div class="judge-identity-list" role="list">
+        <button type="button" class="judge-identity judge-identity--blue" data-judge="judge1">
+          <span class="identity-icon" aria-hidden="true">&#9813;</span>
+          <span class="identity-copy"><strong>PETUGAS JURI 1</strong><small>PANEL BIRU</small></span>
+          <span class="identity-action">MASUK PANEL <b>&rarr;</b></span>
+        </button>
+        <button type="button" class="judge-identity judge-identity--purple" data-judge="judge2">
+          <span class="identity-icon" aria-hidden="true">&#9813;</span>
+          <span class="identity-copy"><strong>PETUGAS JURI 2</strong><small>PANEL TENGAH</small></span>
+          <span class="identity-action">MASUK PANEL <b>&rarr;</b></span>
+        </button>
+        <button type="button" class="judge-identity judge-identity--red" data-judge="judge3">
+          <span class="identity-icon" aria-hidden="true">&#9813;</span>
+          <span class="identity-copy"><strong>PETUGAS JURI 3</strong><small>PANEL MERAH</small></span>
+          <span class="identity-action">MASUK PANEL <b>&rarr;</b></span>
+        </button>
+      </div>
+
+      <p id="loginStatus" class="login-status" aria-live="polite">Pilih salah satu identitas untuk melanjutkan.</p>
+    </section>
+
+    <div id="passwordModal" class="password-modal" hidden>
+      <form id="passwordForm" class="password-card" autocomplete="off">
+        <button type="button" id="passwordClose" class="password-close" aria-label="Tutup">&times;</button>
+        <span id="passwordJudgeLabel" class="password-kicker">PETUGAS JURI 1</span>
+        <h2>MASUKKAN PASSWORD</h2>
+        <p>Password diperlukan untuk membuka panel penilaian Juri.</p>
+        <label for="judgePassword">PASSWORD JURI</label>
+        <input id="judgePassword" type="password" class="password-input" autocomplete="off" required>
+        <div id="passwordError" class="password-error" aria-live="polite"></div>
+        <button type="submit" class="password-submit">MASUK PANEL <span>&rarr;</span></button>
+      </form>
+    </div>
+
+    <footer class="login-footer">OFFLINE TOURNAMENT SYSTEM <span></span> SYSTEM ONLINE</footer>
+  </main>
+
+  <script src="js/state.js"></script>
+  <script src="js/juri-login.js"></script>
+</body>
+</html>

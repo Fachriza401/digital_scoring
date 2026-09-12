@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#05060a">
+<title>Sekretaris — IPSI Scoring Live Digital</title>
+<link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+<link rel="stylesheet" href="css/global.css">
+<link rel="stylesheet" href="css/sekretaris.css">
+</head>
+<body class="page-sekretaris" data-mode="sekretaris">
+
+  <nav class="navbar" aria-label="Navigasi utama">
+    <div class="navbar-left">
+      <a class="navbar-back" href="index.html">&larr; Beranda</a>
+      <span class="navbar-brand">IPSI Scoring Live Digital</span>
+      <span class="navbar-status" data-sync-indicator>SYSTEM ONLINE</span>
+      <span class="navbar-user">USER: ADMIN (ADMIN)</span>
+      <span class="navbar-badge">Active: Sekretaris View</span>
+    </div>
+    <div class="navbar-right">
+      <button type="button" class="btn-fs" data-action="fullscreen">FULLSCREEN</button>
+      <span class="navbar-unlock">SYSTEM UNLOCKED</span>
+    </div>
+  </nav>
+
+  <div id="toastArea" aria-live="polite"></div>
+
+  <main class="sekretaris-main">
+    <header class="sekretaris-head">
+      <div>
+        <span class="mini-label">EVENT KEJUARAAN</span>
+        <h1 id="headEventName" class="head-event">KEJUARAAN NASIONAL PENCAK SILAT 2026</h1>
+      </div>
+      <div class="head-meta">
+        <span id="headStatus" class="status-pill status-ready">READY</span>
+        <span id="headTimer" class="head-timer" role="timer">02:00</span>
+      </div>
+    </header>
+
+    <section class="sekretaris-grid">
+      <article class="panel panel--form">
+        <h2 class="section-heading">DATA PERTANDINGAN</h2>
+
+        <div class="field">
+          <label for="fEventName">NAMA EVENT</label>
+          <input type="text" id="fEventName" class="input" maxlength="40" autocomplete="off">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="fMatch">NOMOR PARTAI</label>
+            <input type="text" id="fMatch" class="input" maxlength="40" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="fSchedule">JADWAL</label>
+            <input type="text" id="fSchedule" class="input" maxlength="40" autocomplete="off" placeholder="cth: 08:30 WIB">
+          </div>
+        </div>
+
+        <div class="field-pair">
+          <div class="field">
+            <label for="fBlueName">ATLET BIRU</label>
+            <input type="text" id="fBlueName" class="input" maxlength="40" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="fRedName">ATLET MERAH</label>
+            <input type="text" id="fRedName" class="input" maxlength="40" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="fBlueContingent">KONTINGEN BIRU</label>
+            <input type="text" id="fBlueContingent" class="input" maxlength="40" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="fRedContingent">KONTINGEN MERAH</label>
+            <input type="text" id="fRedContingent" class="input" maxlength="40" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="fCategory">KATEGORI</label>
+            <input type="text" id="fCategory" class="input" maxlength="40" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="fDurMin">DURASI TANDING (MENIT)</label>
+            <input type="number" id="fDurMin" class="input" min="0" max="99" step="1" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label for="fDurSec">DETIK</label>
+            <input type="number" id="fDurSec" class="input" min="0" max="59" step="1" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label for="fRounds">JUMLAH BABAK</label>
+            <input type="number" id="fRounds" class="input" min="1" max="9" step="1" inputmode="numeric">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="btnSave" class="btn btn-primary">SIMPAN PERTANDINGAN</button>
+          <button type="button" id="btnStart" class="btn btn-gold">MULAI PERTANDINGAN</button>
+        </div>
+      </article>
+
+      <article class="panel panel--control">
+        <h2 class="section-heading">KONTROL &amp; DATA</h2>
+
+        <div class="control-block">
+          <span class="mini-label">BATCH IMPORT TABLE (CSV)</span>
+          <p class="control-help">Muat data partai dan peserta dari file CSV.</p>
+          <button type="button" id="btnCsvTemplate" class="btn btn-ghost btn-block">DOWNLOAD TEMPLATE CSV</button>
+          <label class="btn btn-ghost btn-block file-label" for="csvFile">CARI FILE CSV
+            <input type="file" id="csvFile" accept="text/csv,.csv" hidden>
+          </label>
+        </div>
+
+        <div class="control-block">
+          <span class="mini-label">TIMER</span>
+          <div class="control-timer" id="ctrlTimer">02:00</div>
+          <div class="control-btns">
+            <button type="button" id="btnPlay" class="btn btn-gold">PLAY</button>
+            <button type="button" id="btnPause" class="btn btn-primary">PAUSE</button>
+            <button type="button" id="btnResetTimer" class="btn btn-ghost">RESET</button>
+          </div>
+          <div id="roundChips" class="chips" role="group" aria-label="Pilih babak"></div>
+        </div>
+
+        <div class="control-block">
+          <span class="mini-label">SISTEM DATA</span>
+          <button type="button" id="btnExport" class="btn btn-ghost btn-block">EXPORT DATA (JSON)</button>
+          <label class="btn btn-ghost btn-block file-label" for="importFile">IMPORT DATA (JSON)
+            <input type="file" id="importFile" accept="application/json,.json" hidden>
+          </label>
+        </div>
+
+        <div class="control-block">
+          <span class="mini-label">DANGER ZONE</span>
+          <button type="button" id="btnResetAll" class="btn btn-danger btn-block">RESET SEMUA DATA</button>
+        </div>
+      </article>
+
+      <article class="panel panel--result">
+        <h2 class="section-heading">TETAPKAN HASIL AKHIR &amp; SIMPAN HISTORI</h2>
+        <div class="result-score-grid">
+          <div class="result-score result-score--blue"><span>TOTAL SKOR BIRU</span><strong id="finalBlueScore">0</strong></div>
+          <div class="result-score result-score--red"><span>TOTAL SKOR MERAH</span><strong id="finalRedScore">0</strong></div>
+        </div>
+        <div class="result-actions">
+          <button type="button" id="btnBlueWinner" class="btn btn-blue">BIRU MENANG</button>
+          <button type="button" id="btnRedWinner" class="btn btn-red">MERAH MENANG</button>
+          <button type="button" id="btnDrawWinner" class="btn btn-ghost btn-block">HASIL SERI</button>
+        </div>
+        <p class="result-note">Setelah pemenang ditetapkan, rekam tanding otomatis disimpan ke histori.</p>
+      </article>
+
+      <article class="panel panel--history">
+        <h2 class="section-heading">HISTORI REKOR LAGA SELESAI</h2>
+        <div id="matchHistory" class="history-list" aria-live="polite"></div>
+      </article>
+    </section>
+  </main>
+
+  <div id="resetModal" class="modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+      <h2 id="resetTitle" class="modal-title">RESET PERTANDINGAN?</h2>
+      <p class="modal-text">Seluruh skor, timer, log dan penilaian akan dikembalikan ke kondisi awal.</p>
+      <div class="modal-actions">
+        <button type="button" id="btnResetCancel" class="btn btn-ghost">BATAL</button>
+        <button type="button" id="btnResetConfirm" class="btn btn-danger">RESET</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="resetAllModal" class="modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="resetAllTitle">
+      <h2 id="resetAllTitle" class="modal-title">RESET SEMUA DATA?</h2>
+      <p class="modal-text">Seluruh data event, skor, timer dan log akan dihapus dan kembali ke kondisi awal sistem.</p>
+      <div class="modal-actions">
+        <button type="button" id="btnResetAllCancel" class="btn btn-ghost">BATAL</button>
+        <button type="button" id="btnResetAllConfirm" class="btn btn-danger">RESET</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/sync.js"></script>
+  <script src="js/dewan.js"></script>
+  <script src="js/juri.js"></script>
+  <script src="js/monitor.js"></script>
+  <script src="js/sekretaris.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

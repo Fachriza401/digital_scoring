@@ -1,0 +1,276 @@
+/* ================================================================
+   JURI.CSS — Halaman Penilaian Juri
+   ================================================================ */
+
+.page-juri {
+  min-height:100vh;
+  background:
+    radial-gradient(1200px 500px at 50% -10%,rgba(91,53,168,0.16),transparent 60%),
+    var(--bg-primary);
+}
+
+.juri-main {
+  max-width:1400px;
+  margin:0 auto;
+  padding:1rem 1.1rem 3rem;
+}
+
+.match-info {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:0.6rem;
+  align-items:center;
+  padding:0.8rem 1rem;
+  background:linear-gradient(180deg,var(--panel),var(--panel-alt));
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--glow-sm);
+  margin-bottom:0.9rem;
+  text-align:center;
+}
+@media (min-width:820px) {
+  .match-info { grid-template-columns:1fr auto 1fr; text-align:left; }
+  .match-info-left { text-align:left; }
+  .match-info-right { text-align:right; }
+}
+.mini-label {
+  display:inline-block;
+  font-size:0.62rem;
+  font-weight:800;
+  letter-spacing:0.16em;
+  color:var(--text-muted);
+  text-transform:uppercase;
+  margin-bottom:0.15rem;
+}
+.match-event { font-weight:800; font-size:0.95rem; color:var(--purple-bright); }
+.match-sub { font-size:0.78rem; color:var(--text-secondary); font-weight:600; }
+.match-round-line { display:flex; align-items:center; gap:0.55rem; justify-content:center; }
+.match-round { font-weight:900; font-size:0.8rem; letter-spacing:0.14em; color:var(--gold); }
+.match-info-center { display:flex; flex-direction:column; align-items:center; gap:0.2rem; justify-self:center; }
+.match-category { font-size:0.85rem; font-weight:700; }
+.match-timer {
+  font-family:var(--font-num);
+  font-size:clamp(2.2rem,6vw,3.2rem);
+  font-weight:900;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:0.03em;
+}
+.match-timer.is-warning { color:var(--gold); }
+.match-timer.is-finished { color:var(--red); }
+
+.juri-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:0.9rem;
+  align-items:stretch;
+}
+@media (min-width:900px) {
+  .juri-grid { grid-template-columns:minmax(280px,1fr) minmax(240px,0.8fr) minmax(280px,1fr); }
+}
+@media (min-width:900px) and (max-width:1200px) {
+  .juri-grid { grid-template-columns:1fr 1fr; }
+  .juri-center { grid-column:1 / -1; order:-1; }
+}
+
+.corner {
+  padding:1.2rem 1.1rem 1.4rem;
+  border-radius:var(--radius-lg);
+  background:linear-gradient(180deg,var(--panel),var(--panel-alt));
+  box-shadow:var(--glow-sm);
+  display:flex;
+  flex-direction:column;
+}
+@media (max-width:640px) { .corner { min-height:auto; } }
+.corner--blue { border:2px solid var(--blue); background:linear-gradient(180deg,rgba(20,100,255,0.16),rgba(8,18,54,0.96)); box-shadow:0 0 28px rgba(20,100,255,0.22); }
+.corner--red { border:2px solid var(--red); background:linear-gradient(180deg,rgba(240,0,28,0.16),rgba(57,7,18,0.96)); box-shadow:0 0 28px rgba(240,0,28,0.22); }
+.corner.is-disqualified { opacity:0.55; }
+
+.corner-head { display:flex; align-items:center; gap:0.7rem; margin-bottom:1rem; }
+.corner-name { font-size:1.2rem; font-weight:900; line-height:1.2; }
+.corner-contingent { font-size:0.72rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-secondary); }
+.dq-badge {
+  margin-left:auto;
+  padding:0.25rem 0.6rem;
+  border-radius:6px;
+  background:var(--red);
+  color:#fff;
+  font-weight:900;
+  font-size:0.7rem;
+  letter-spacing:0.1em;
+  box-shadow:0 0 12px var(--red-glow);
+}
+
+.score-big {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0.3rem;
+  min-height:96px;
+  padding:0.9rem;
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius);
+  font-weight:900;
+  transition:transform 0.08s,box-shadow 0.12s;
+}
+.score-big:active { transform:scale(0.93); }
+.score-big:disabled { opacity:0.35; pointer-events:none; }
+.score-big .sb-label { font-size:0.95rem; letter-spacing:0.14em; }
+.score-big .sb-value { font-family:var(--font-num); font-size:1.9rem; font-variant-numeric:tabular-nums; line-height:1; }
+.score-big--blue {
+  background:linear-gradient(180deg,#2670ff,var(--blue));
+  border-color:#5b8dff;
+  color:#fff;
+  box-shadow:0 0 24px var(--blue-glow);
+}
+.score-big--blue:active { box-shadow:0 0 10px var(--blue-glow); }
+.score-big--red {
+  background:linear-gradient(180deg,#ff1e35,var(--red));
+  border-color:#ff6674;
+  color:#fff;
+  box-shadow:0 0 24px var(--red-glow);
+}
+.score-big--red:active { box-shadow:0 0 10px var(--red-glow); }
+
+.corner-buttons {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0.7rem;
+  margin-top:auto;
+}
+
+.counters {
+  display:flex;
+  flex-direction:column;
+  gap:0.4rem;
+  margin-bottom:0.9rem;
+}
+.counter {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0.45rem 0.7rem;
+  border-radius:var(--radius-sm);
+  background:var(--bg-secondary);
+  border:1px solid var(--border);
+  font-size:0.78rem;
+  font-weight:800;
+  letter-spacing:0.05em;
+  color:var(--text-secondary);
+}
+.counter b {
+  font-family:var(--font-num);
+  font-variant-numeric:tabular-nums;
+  font-size:1rem;
+  color:var(--text-primary);
+}
+
+.juri-center {
+  padding:1.2rem 1.1rem;
+  border-radius:var(--radius-lg);
+  background:linear-gradient(180deg,var(--panel),var(--panel-alt));
+  box-shadow:var(--glow-sm);
+  border:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  gap:0.9rem;
+}
+.section-heading {
+  font-size:0.8rem;
+  font-weight:900;
+  letter-spacing:0.16em;
+  color:var(--text-secondary);
+  text-transform:uppercase;
+}
+.judge-selector { display:flex; flex-direction:column; gap:0.6rem; }
+.judge-opt {
+  min-height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:0.5rem;
+  padding:0.5rem 0.9rem;
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--bg-secondary);
+  color:var(--text-primary);
+  font-weight:800;
+  font-size:0.9rem;
+  letter-spacing:0.08em;
+}
+.judge-opt:hover { border-color:var(--purple); }
+.judge-opt.is-active {
+  background:linear-gradient(180deg,var(--purple-bright),var(--purple));
+  border-color:var(--purple-dim);
+  color:#fff;
+}
+.judge-opt:disabled { opacity:0.45; cursor:not-allowed; }
+.judge-lock { text-align:center; }
+.judge-lock[hidden] { display:none; }
+.active-judge-label, .judge-athlete-label { display:none; }
+
+/* Reference layout: the judge only needs context and two very large actions. */
+@media (min-width:900px) {
+  .page-juri .navbar { padding-inline:1.5rem; }
+  .juri-main { max-width:none; padding:0.6rem 1rem 1rem; }
+  .page-juri .match-info {
+    grid-template-columns:1fr auto 1fr;
+    min-height:54px;
+    margin-bottom:0.55rem;
+    padding:0.45rem 0.8rem;
+    border-radius:0;
+    background:rgba(5,6,10,0.7);
+    box-shadow:none;
+  }
+  .page-juri .match-info-left .mini-label,
+  .page-juri .match-info-left .match-event,
+  .page-juri .match-info-left .match-sub,
+  .page-juri .match-info-right { display:none; }
+  .page-juri .active-judge-label {
+    display:inline-flex;
+    align-items:center;
+    min-height:30px;
+    padding:0 0.8rem;
+    border-radius:999px;
+    background:linear-gradient(90deg,var(--purple),#6b21a8);
+    color:#fff;
+    font-weight:900;
+    letter-spacing:0.08em;
+  }
+  .page-juri .judge-athlete-label { display:inline-block; margin-left:0.45rem; color:var(--text-secondary); font-size:0.7rem; }
+  .page-juri .match-info-center { grid-column:3; flex-direction:row; justify-self:end; gap:0.7rem; }
+  .page-juri .match-round-line { order:2; }
+  .page-juri .match-timer { font-size:1.35rem; color:var(--purple-bright); }
+  .page-juri .juri-grid { grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:0.8rem; }
+  .page-juri .juri-center {
+    grid-column:1 / -1;
+    grid-row:1;
+    flex-direction:row;
+    align-items:center;
+    gap:0.55rem;
+    min-height:42px;
+    padding:0.35rem 0.55rem;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+    border:0;
+  }
+  .page-juri .juri-center .section-heading { display:none; }
+  .page-juri .judge-selector { flex-direction:row; flex:1; gap:0.35rem; }
+  .page-juri .judge-opt { min-height:34px; justify-content:center; padding:0.25rem 0.7rem; font-size:0.7rem; border-radius:6px; }
+  .page-juri .judge-lock { order:3; white-space:nowrap; }
+  .page-juri .judge-lock .status-pill { font-size:0.6rem; padding:0.25rem 0.5rem; }
+  .page-juri .juri-center .btn { min-height:34px; padding:0.25rem 0.65rem; font-size:0.62rem; }
+  .page-juri .corner { grid-row:2; min-height:calc(100vh - 160px); padding:0.85rem; border-radius:16px; }
+  .page-juri .corner-buttons { gap:0.7rem; }
+  .page-juri .score-big { min-height:calc(100vh - 330px); border-radius:16px; }
+  .page-juri .score-big .sb-label { font-size:clamp(1.1rem,2vw,1.5rem); }
+  .page-juri .score-big .sb-value { font-size:clamp(1rem,2vw,1.35rem); }
+  .page-juri .counters { flex-direction:row; margin-bottom:0.55rem; }
+  .page-juri .counter { flex:1; padding:0.3rem 0.5rem; font-size:0.62rem; }
+}
+
+@media (max-width:899px) {
+  .page-juri .score-big { min-height:150px; }
+}
