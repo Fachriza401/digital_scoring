@@ -12,6 +12,7 @@
 .judge-login-shell {
   position:relative;
   min-height:100vh;
+  overflow:hidden;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -138,3 +139,88 @@
 .password-submit:hover { background:linear-gradient(180deg,#fff07c,#ffd000); }
 .password-submit span { margin-left:0.35rem; font-size:1.1rem; }
 
+
+/* ---- professional tournament overrides ---- */
+.page-juri-login {
+  background:
+    linear-gradient(90deg,rgba(59,130,246,0.06),transparent 32%,transparent 68%,rgba(239,68,68,0.05)),
+    var(--bg-primary);
+}
+.judge-login-shell::before {
+  border-color:var(--border);
+  box-shadow:0 0 0 42px rgba(148,163,184,0.025);
+  transform:translate(-50%,-50%) rotate(45deg);
+}
+.judge-login-shell::after {
+  opacity:0.4;
+  background-image:linear-gradient(rgba(148,163,184,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,0.05) 1px,transparent 1px);
+}
+.judge-login-art { opacity:0.07; filter:none; box-shadow:none; }
+.login-back {
+  border-color:var(--border);
+  background:var(--panel);
+  color:var(--text-secondary);
+}
+.login-back:hover { border-color:var(--blue); color:var(--text-primary); }
+.login-kicker { color:var(--blue-bright); }
+.login-kicker span { background:linear-gradient(90deg,transparent,var(--blue)); }
+.login-kicker span:last-child { background:linear-gradient(90deg,var(--blue),transparent); }
+.judge-login-panel h1 {
+  color:var(--text-primary);
+  text-shadow:none;
+  font-family:var(--font-num);
+}
+.login-subtitle { color:var(--text-secondary); }
+.judge-identity {
+  border-color:var(--border);
+  background:var(--panel);
+  box-shadow:var(--glow-sm);
+}
+.judge-identity::before { box-shadow:none; }
+.judge-identity::after { display:none; }
+.judge-identity:hover {
+  transform:translateX(4px);
+  border-color:var(--identity-color);
+  box-shadow:var(--glow-sm);
+}
+.judge-identity--blue { --identity-color:var(--blue); }
+.judge-identity--purple { --identity-color:#64748B; }
+.judge-identity--red { --identity-color:var(--red); }
+.identity-icon {
+  background:var(--bg-secondary);
+  border:1px solid var(--identity-color);
+  color:var(--identity-color);
+  box-shadow:none;
+}
+.identity-copy small { color:var(--text-muted); }
+.login-status { color:var(--text-muted); }
+.login-footer { color:var(--text-muted); }
+.login-footer span { box-shadow:none; }
+.password-card {
+  border-color:var(--border-strong);
+  background:var(--panel);
+  box-shadow:0 24px 80px rgba(0,0,0,0.55);
+}
+.password-kicker,
+.password-card label { color:var(--blue-bright); }
+.password-card p,
+.password-close { color:var(--text-secondary); }
+.password-input {
+  border-color:var(--border-strong);
+  background:var(--bg-secondary);
+}
+.password-input:focus { outline:2px solid var(--blue); }
+.password-toggle {
+  border-color:var(--border-strong);
+  background:var(--bg-secondary);
+  color:var(--blue-bright);
+}
+.password-toggle:hover { background:var(--panel-alt); color:var(--text-primary); }
+.password-error { color:var(--red-bright); }
+.password-submit {
+  border-color:var(--blue-dark);
+  background:var(--blue);
+  color:#fff;
+  box-shadow:none;
+}
+.password-submit:hover { background:#2563EB; }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#05060a">
+<meta name="theme-color" content="#0B0F19">
 <title>Juri — IPSI Scoring Live Digital</title>
 <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
 <link rel="stylesheet" href="css/global.css">
@@ -20,7 +20,9 @@
       <span class="navbar-badge">Active: Juri View</span>
     </div>
     <div class="navbar-right">
+      <a class="navbar-back" href="bracket.html">BAGAN</a>
       <button type="button" class="btn-fs" data-action="fullscreen">FULLSCREEN</button>
+      <button type="button" id="btnExit" class="btn-fs">KELUAR</button>
       <span class="navbar-unlock">SYSTEM UNLOCKED</span>
     </div>
   </nav>
@@ -52,11 +54,18 @@
     <section class="juri-grid">
       <aside class="corner corner--blue">
         <header class="corner-head">
-          <span class="team-dot"></span>
-          <div>
+          <div class="team-logo team-logo--club" title="Logo perguruan biru">
+            <img id="blueClubLogo" alt="Logo perguruan sudut biru">
+            <span>LOGO</span>
+          </div>
+          <div class="corner-ident">
             <span class="mini-label">SUDUT BIRU</span>
             <h2 id="blueName" class="corner-name">PESILAT BIRU</h2>
             <span id="blueContingent" class="corner-contingent">KONTINGEN BIRU</span>
+          </div>
+          <div class="team-logo team-logo--contingent" title="Logo kontingen biru">
+            <img id="blueContingentLogo" alt="Logo kontingen sudut biru">
+            <span>DAERAH</span>
           </div>
           <span id="blueDq" class="dq-badge" hidden>DISK</span>
         </header>
@@ -75,11 +84,18 @@
 
       <aside class="corner corner--red">
         <header class="corner-head">
-          <span class="team-dot"></span>
-          <div>
+          <div class="team-logo team-logo--club" title="Logo perguruan merah">
+            <img id="redClubLogo" alt="Logo perguruan sudut merah">
+            <span>LOGO</span>
+          </div>
+          <div class="corner-ident">
             <span class="mini-label">SUDUT MERAH</span>
             <h2 id="redName" class="corner-name">PESILAT MERAH</h2>
             <span id="redContingent" class="corner-contingent">KONTINGEN MERAH</span>
+          </div>
+          <div class="team-logo team-logo--contingent" title="Logo kontingen merah">
+            <img id="redContingentLogo" alt="Logo kontingen sudut merah">
+            <span>DAERAH</span>
           </div>
           <span id="redDq" class="dq-badge" hidden>DISK</span>
         </header>
@@ -118,6 +134,7 @@
   <script src="js/juri.js"></script>
   <script src="js/monitor.js"></script>
   <script src="js/sekretaris.js"></script>
+  <script src="js/bracket.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

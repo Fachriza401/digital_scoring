@@ -492,4 +492,216 @@
   align-items:center;
   gap:0.5rem;
 }
-.dur-sep { font-size:1.4rem; font-weight:900; color:var(--text-secondary); }
+.dur-sep { font-size:1.4rem; font-weight:900; color:var(--text-secondary); }/* ---- professional tournament overrides ---- */
+.page-dewan {
+  background:
+    linear-gradient(180deg,rgba(59,130,246,0.045),transparent 300px),
+    var(--bg-primary);
+}
+
+.page-dewan .team-panel--blue,
+.page-dewan .team-panel--red {
+  border-width:1px;
+  box-shadow:var(--glow-sm);
+}
+.page-dewan .team-panel--blue {
+  border-color:rgba(59,130,246,0.55);
+  background:linear-gradient(180deg,rgba(59,130,246,0.12),rgba(17,24,39,0.98) 45%);
+}
+.page-dewan .team-panel--red {
+  border-color:rgba(239,68,68,0.55);
+  background:linear-gradient(180deg,rgba(239,68,68,0.11),rgba(17,24,39,0.98) 45%);
+}
+.page-dewan .team-dot { box-shadow:none; }
+.page-dewan .team-head { gap:0.55rem; flex-wrap:nowrap; }
+.page-dewan .team-ident { flex:1; min-width:0; }
+.page-dewan .team-name { line-height:1.15; }
+.page-dewan .team-contingent {
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.page-dewan .dq-badge { box-shadow:none; margin-left:0; }
+.page-dewan .team-score { text-shadow:none; }
+.page-dewan .team-score--blue { color:var(--blue-bright); }
+.page-dewan .team-score--red { color:var(--red-bright); }
+.page-dewan .team-stats {
+  justify-content:space-between;
+  gap:0.35rem;
+  padding:0.45rem 0.55rem;
+  border-radius:8px;
+  background:rgba(11,15,25,0.52);
+  border:1px solid var(--border);
+}
+.page-dewan .team-stats span { white-space:nowrap; font-size:0.62rem; }
+
+.page-dewan .score-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:0.45rem; }
+.page-dewan .sb {
+  min-height:54px;
+  padding:0.35rem 0.25rem;
+  border-radius:8px;
+  font-size:0.62rem;
+  line-height:1.15;
+  text-align:center;
+}
+.page-dewan .sb .sb-label { display:block; }
+.page-dewan .sb .v { font-size:0.92rem; }
+.page-dewan .sb--reset { grid-column:1 / -1; min-height:38px; }
+.page-dewan .sb--gold { background:var(--gold); }
+.page-dewan .sb--blue { background:var(--blue); border-color:var(--blue-dark); }
+.page-dewan .sb--red { background:var(--red); border-color:var(--red-dark); }
+
+.page-dewan .timer-track { margin-top:0.55rem; }
+.page-dewan #timerBar {
+  background:var(--blue);
+  box-shadow:none;
+}
+.page-dewan #btnEmergency.is-emergency {
+  background:var(--red);
+  border-color:var(--red-dark);
+  color:#fff;
+}
+
+.page-dewan .judge-monitor.panel,
+.page-dewan .verify-panel.panel,
+.page-dewan .log-panel {
+  background:var(--panel);
+  box-shadow:none;
+}
+.page-dewan .judge-id { color:var(--blue-bright); }
+
+/* ---- timeline keputusan ---- */
+.timeline-panel {
+  margin-top:1rem;
+  padding:1rem;
+}
+.timeline-head {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:0.8rem;
+  flex-wrap:wrap;
+  padding-bottom:0.75rem;
+  border-bottom:1px solid var(--border);
+}
+.timeline-head .section-heading { margin-bottom:0.15rem; }
+.timeline-help {
+  color:var(--text-muted);
+  font-size:0.72rem;
+}
+.timeline-actions {
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+  flex-wrap:wrap;
+}
+.timeline-filters {
+  display:flex;
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+}
+.timeline-filter {
+  min-height:36px;
+  padding:0.3rem 0.65rem;
+  border:0;
+  border-right:1px solid var(--border);
+  background:var(--bg-secondary);
+  color:var(--text-muted);
+  font-size:0.64rem;
+  font-weight:800;
+  letter-spacing:0.06em;
+}
+.timeline-filter:last-child { border-right:0; }
+.timeline-filter.is-active { background:var(--blue); color:#fff; }
+.timeline-list {
+  display:flex;
+  flex-direction:column;
+  gap:0.35rem;
+  max-height:260px;
+  overflow:auto;
+  padding-top:0.65rem;
+}
+.timeline-item {
+  display:flex;
+  align-items:flex-start;
+  gap:0.6rem;
+  padding:0.45rem 0.6rem;
+  border:1px solid var(--border);
+  border-left:3px solid var(--border-strong);
+  border-radius:8px;
+  background:var(--bg-secondary);
+}
+.timeline-item--blue { border-left-color:var(--blue); }
+.timeline-item--red { border-left-color:var(--red); }
+.timeline-item--emergency { border-color:rgba(239,68,68,0.55); background:rgba(239,68,68,0.08); }
+.timeline-marker {
+  display:grid;
+  place-items:center;
+  width:24px;
+  height:24px;
+  flex:0 0 24px;
+  border-radius:50%;
+  background:var(--panel);
+  border:1px solid var(--border-strong);
+  font-family:var(--font-num);
+  font-size:0.68rem;
+  font-weight:900;
+}
+.timeline-item--blue .timeline-marker { color:var(--blue-bright); border-color:var(--blue); }
+.timeline-item--red .timeline-marker { color:var(--red-bright); border-color:var(--red); }
+.timeline-body { flex:1; min-width:0; }
+.timeline-line {
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:0.5rem;
+}
+.timeline-line strong {
+  font-size:0.72rem;
+  letter-spacing:0.03em;
+}
+.timeline-line time {
+  font-family:var(--font-mono);
+  font-size:0.6rem;
+  color:var(--text-muted);
+  white-space:nowrap;
+}
+.timeline-detail {
+  display:block;
+  margin-top:0.1rem;
+  font-size:0.64rem;
+  color:var(--text-muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.timeline-value {
+  font-family:var(--font-num);
+  font-size:0.86rem;
+  color:var(--text-primary);
+}
+.timeline-empty {
+  padding:1rem;
+  text-align:center;
+  color:var(--text-muted);
+  font-size:0.76rem;
+  border:1px dashed var(--border);
+  border-radius:8px;
+}
+
+@media (max-width:1099px) {
+  .page-dewan .score-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .page-dewan .sb--reset { grid-column:1 / -1; }
+}
+@media (max-width:899px) {
+  .page-dewan .score-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .timeline-panel { margin-top:0.8rem; }
+}
+@media (max-width:520px) {
+  .page-dewan .score-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .page-dewan .team-head { flex-wrap:wrap; }
+  .page-dewan .team-ident { flex-basis:100%; order:3; }
+  .timeline-actions { width:100%; justify-content:space-between; }
+}

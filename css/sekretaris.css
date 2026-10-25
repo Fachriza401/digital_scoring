@@ -188,3 +188,169 @@
   .field-row { grid-template-columns:1fr; gap:0; }
   .result-actions { grid-template-columns:1fr; }
 }
+/* ---- professional tournament overrides ---- */
+.page-sekretaris {
+  background:
+    linear-gradient(180deg,rgba(59,130,246,0.045),transparent 300px),
+    var(--bg-primary);
+}
+.page-sekretaris .sekretaris-head {
+  background:var(--panel);
+  box-shadow:var(--glow-sm);
+}
+.page-sekretaris .head-event { color:var(--text-primary); }
+.page-sekretaris .panel {
+  background:var(--panel);
+  box-shadow:var(--glow-sm);
+}
+.page-sekretaris .panel--result { border-color:rgba(59,130,246,0.4); }
+.page-sekretaris .section-heading { color:var(--text-primary); }
+
+.team-form {
+  margin:0.2rem 0 0.9rem;
+  padding:0.8rem;
+  border:1px solid var(--border);
+  border-left:3px solid var(--border-strong);
+  border-radius:var(--radius-sm);
+  background:var(--bg-secondary);
+}
+.team-form--blue { border-left-color:var(--blue); }
+.team-form--red { border-left-color:var(--red); }
+.team-form-head {
+  display:flex;
+  align-items:center;
+  gap:0.45rem;
+  margin-bottom:0.65rem;
+  font-size:0.68rem;
+  font-weight:900;
+  letter-spacing:0.12em;
+  color:var(--text-secondary);
+}
+.team-form .field { margin-bottom:0.6rem; }
+.team-form .field:last-child { margin-bottom:0; }
+.team-dot {
+  width:10px;
+  height:10px;
+  border-radius:3px;
+  flex:none;
+}
+.team-form--blue .team-dot { background:var(--blue); }
+.team-form--red .team-dot { background:var(--red); }
+
+.logo-form-row {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0.6rem;
+}
+.logo-picker {
+  display:flex;
+  flex-direction:column;
+  gap:0.25rem;
+  min-width:0;
+}
+.logo-picker-body {
+  display:flex;
+  align-items:center;
+  gap:0.35rem;
+  flex-wrap:wrap;
+}
+.logo-preview {
+  width:52px;
+  height:52px;
+  flex:0 0 52px;
+  border-radius:8px;
+  border:1px dashed var(--border-strong);
+  background:rgba(148,163,184,0.05);
+  object-fit:contain;
+  padding:4px;
+}
+.logo-preview.has-image {
+  border-style:solid;
+  background:#fff;
+}
+.file-label { display:inline-flex; align-items:center; justify-content:center; }
+
+.field-row--duration {
+  grid-template-columns:1fr 1fr 1fr;
+}
+.duration-tools {
+  display:flex;
+  gap:0.4rem;
+  flex-wrap:wrap;
+  margin-bottom:0.9rem;
+}
+.duration-tools .btn { flex:1 1 auto; }
+.control-btns--compact { margin-top:0.4rem; }
+
+.panel--classes .class-form {
+  padding-bottom:0.9rem;
+  margin-bottom:0.8rem;
+  border-bottom:1px solid var(--border);
+}
+.panel--classes .class-form .field { margin-bottom:0.6rem; }
+.class-list {
+  display:flex;
+  flex-direction:column;
+  gap:0.45rem;
+  max-height:260px;
+  overflow:auto;
+  margin-bottom:0.8rem;
+}
+.class-item {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:0.6rem;
+  padding:0.55rem 0.65rem;
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  background:var(--bg-secondary);
+}
+.class-item.is-active {
+  border-color:rgba(59,130,246,0.55);
+  background:rgba(59,130,246,0.09);
+}
+.class-item-info {
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+.class-item-info strong {
+  font-size:0.78rem;
+  line-height:1.25;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.class-item-info span {
+  font-size:0.64rem;
+  color:var(--text-muted);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.class-item-actions {
+  display:flex;
+  gap:0.3rem;
+  flex:none;
+}
+.class-list .history-empty {
+  padding:0.75rem;
+  border:1px dashed var(--border);
+  border-radius:var(--radius-sm);
+}
+
+.page-sekretaris .chip.is-active {
+  background:var(--blue);
+  border-color:var(--blue-dark);
+}
+.page-sekretaris .result-note { background:var(--bg-secondary); }
+.page-sekretaris .history-item { border-left-color:var(--blue); }
+
+@media (max-width:520px) {
+  .logo-form-row { grid-template-columns:1fr; }
+  .field-row--duration { grid-template-columns:1fr 1fr 1fr; gap:0.4rem; }
+  .class-item { flex-wrap:wrap; }
+  .class-item-actions { width:100%; }
+  .class-item-actions .btn { flex:1; }
+}

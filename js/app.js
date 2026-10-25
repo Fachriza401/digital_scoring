@@ -35,6 +35,53 @@
       var d = document.createElement("div");
       d.textContent = text == null ? "" : String(text);
       return d.innerHTML;
+    },
+    fitText: function (node, options) {
+      if (!node) return;
+      var opts = options || {};
+      var min = opts.min || 12;
+      var max = opts.max || parseFloat(global.getComputedStyle(node).fontSize) || 24;
+      node.style.whiteSpace = "nowrap";
+      node.style.overflow = "hidden";
+      node.style.textOverflow = "ellipsis";
+      var size = max;
+      node.style.fontSize = size + "px";
+      if (node.clientWidth <= 0) return;
+      while (size > min && node.scrollWidth > node.clientWidth + 1) {
+        size -= 1;
+        node.style.fontSize = size + "px";
+      }
+    },
+    readImageFile: function (file, maxSize) {
+      return new Promise(function (resolve, reject) {
+        if (!file || !/^image\//.test(file.type)) {
+          reject(new Error("FILE BUKAN GAMBAR"));
+          return;
+        }
+        var reader = new FileReader();
+        reader.onerror = function () { reject(new Error("GAGAL MEMBACA GAMBAR")); };
+        reader.onload = function () {
+          var img = new Image();
+          img.onerror = function () { reject(new Error("GAMBAR TIDAK VALID")); };
+          img.onload = function () {
+            var limit = maxSize || 256;
+            var scale = Math.min(1, limit / Math.max(img.width, img.height));
+            var w = Math.max(1, Math.round(img.width * scale));
+            var h = Math.max(1, Math.round(img.height * scale));
+            var canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = h;
+            var ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, w, h);
+            ctx.drawImage(img, 0, 0, w, h);
+            var out = canvas.toDataURL("image/png");
+            if (out.length > 380000) out = canvas.toDataURL("image/jpeg", 0.85);
+            resolve(out);
+          };
+          img.src = String(reader.result || "");
+        };
+        reader.readAsDataURL(file);
+      });
     }
   };
 
@@ -79,6 +126,7 @@
     else if (mode === "juri" && global.IPSI.Juri) global.IPSI.Juri.init();
     else if (mode === "monitor" && global.IPSI.Monitor) global.IPSI.Monitor.init();
     else if (mode === "sekretaris" && global.IPSI.Sekretaris) global.IPSI.Sekretaris.init();
+    else if (mode === "bracket" && global.IPSI.Bracket) global.IPSI.Bracket.init();
   }
 
   if (document.readyState === "loading") {

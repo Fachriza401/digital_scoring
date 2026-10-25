@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#05060a">
+<meta name="theme-color" content="#0B0F19">
 <title>Monitor — IPSI Scoring Live Digital</title>
 <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
 <link rel="stylesheet" href="css/global.css">
@@ -27,26 +27,41 @@
 
   <main class="monitor">
     <header class="monitor-toolbar monitor-ui">
-      <div class="monitor-logo-slot"><img id="monitorLogoLeft" src="" alt="Logo kiri"><span>LOGO KIRI</span></div>
+      <div class="monitor-logo-slot"><img id="monitorLogoLeft" src="" alt="Logo kiri"><span>LOGO</span></div>
       <div class="monitor-heading">
         <span class="monitor-organizer">IKATAN PENCAK SILAT INDONESIA</span>
         <span class="monitor-event" id="miEventName">KEJUARAAN NASIONAL PENCAK SILAT 2026</span>
         <span id="miMatchLine" class="monitor-match">PARTAI: 01 &nbsp;|&nbsp; KELAS: A (PUTRA)</span>
       </div>
       <div class="monitor-toolbar-right">
-        <div class="monitor-logo-slot"><img id="monitorLogoRight" src="" alt="Logo kanan"><span>LOGO KANAN</span></div>
         <span id="miStatus" class="status-pill status-ready">READY</span>
+        <div class="monitor-logo-slot"><img id="monitorLogoRight" src="" alt="Logo kanan"><span>LOGO</span></div>
       </div>
     </header>
-
-    <h1 class="monitor-title monitor-ui">MONITOR PENONTON</h1>
 
     <section class="scoreboard" aria-label="Papan skor">
       <div class="monitor-side monitor-side--blue">
         <aside class="board board--blue">
-          <span class="mini-label">SUDUT BIRU</span>
-          <h2 id="miBlueName" class="board-name">PESILAT BIRU</h2>
-          <span id="miBlueContingent" class="board-contingent">KONTINGEN BIRU</span>
+          <div class="board-identity">
+            <div class="team-logo team-logo--club" title="Logo perguruan biru">
+              <img id="miBlueClubLogo" alt="Logo perguruan sudut biru">
+              <span>LOGO</span>
+            </div>
+            <div class="board-ident-text">
+              <span class="mini-label">SUDUT BIRU</span>
+              <h2 id="miBlueName" class="board-name">PESILAT BIRU</h2>
+              <span id="miBlueContingent" class="board-contingent">KONTINGEN BIRU</span>
+            </div>
+            <div class="team-logo team-logo--contingent" title="Logo kontingen biru">
+              <img id="miBlueContingentLogo" alt="Logo kontingen sudut biru">
+              <span>DAERAH</span>
+            </div>
+          </div>
+          <div class="board-penalties" aria-label="Rekap binaan dan pelanggaran pesilat biru">
+            <span><b id="miBlueBinaan">0</b><small>BINAAN</small></span>
+            <span><b id="miBlueTeguran">0</b><small>TEGURAN</small></span>
+            <span><b id="miBluePeringatan">0</b><small>PERINGATAN</small></span>
+          </div>
           <div id="miBlueScore" class="board-score" role="status" aria-live="polite">0</div>
           <span id="miBlueDq" class="dq-badge" hidden>DISK</span>
         </aside>
@@ -60,13 +75,31 @@
         <div id="miTimer" class="board-timer" role="timer">02:00</div>
         <div class="board-vs">VS</div>
         <span class="board-sub">LAYAR SKOR PERTANDINGAN</span>
+        <div class="board-live"><span></span> LIVE SCORING</div>
       </section>
 
       <div class="monitor-side monitor-side--red">
         <aside class="board board--red">
-          <span class="mini-label">SUDUT MERAH</span>
-          <h2 id="miRedName" class="board-name">PESILAT MERAH</h2>
-          <span id="miRedContingent" class="board-contingent">KONTINGEN MERAH</span>
+          <div class="board-identity">
+            <div class="team-logo team-logo--club" title="Logo perguruan merah">
+              <img id="miRedClubLogo" alt="Logo perguruan sudut merah">
+              <span>LOGO</span>
+            </div>
+            <div class="board-ident-text">
+              <span class="mini-label">SUDUT MERAH</span>
+              <h2 id="miRedName" class="board-name">PESILAT MERAH</h2>
+              <span id="miRedContingent" class="board-contingent">KONTINGEN MERAH</span>
+            </div>
+            <div class="team-logo team-logo--contingent" title="Logo kontingen merah">
+              <img id="miRedContingentLogo" alt="Logo kontingen sudut merah">
+              <span>DAERAH</span>
+            </div>
+          </div>
+          <div class="board-penalties" aria-label="Rekap binaan dan pelanggaran pesilat merah">
+            <span><b id="miRedBinaan">0</b><small>BINAAN</small></span>
+            <span><b id="miRedTeguran">0</b><small>TEGURAN</small></span>
+            <span><b id="miRedPeringatan">0</b><small>PERINGATAN</small></span>
+          </div>
           <div id="miRedScore" class="board-score" role="status" aria-live="polite">0</div>
           <span id="miRedDq" class="dq-badge" hidden>DISK</span>
         </aside>
@@ -75,10 +108,41 @@
     </section>
 
     <footer class="monitor-clock">
-      <span id="miClock" class="clock">--:--</span>
+      <span id="miClock" class="clock">--:--:--</span>
       <span id="miDate" class="date">----</span>
     </footer>
   </main>
+
+  <div id="emergencyOverlay" class="emergency-overlay" hidden>
+    <div class="emergency-card">
+      <span class="emergency-kicker">EMERGENCY PAUSE</span>
+      <h2>TIMER DIHENTIKAN</h2>
+      <p>Penanganan medis sedang berlangsung. Pertandingan akan dilanjutkan oleh dewan.</p>
+    </div>
+  </div>
+
+  <div id="roundRecap" class="round-recap" hidden>
+    <div class="round-recap-card">
+      <span id="recapKicker" class="round-recap-kicker">REKAP BABAK 1</span>
+      <h2 id="recapTitle">AKHIR BABAK</h2>
+      <div class="recap-grid">
+        <div class="recap-side recap-side--blue">
+          <span id="recapBlueName">PESILAT BIRU</span>
+          <strong id="recapBlueScore">0</strong>
+        </div>
+        <div class="recap-mid">
+          <span>SKOR BABAK</span>
+          <b id="recapRoundScore">0 - 0</b>
+          <small id="recapWinner">SERI</small>
+        </div>
+        <div class="recap-side recap-side--red">
+          <span id="recapRedName">PESILAT MERAH</span>
+          <strong id="recapRedScore">0</strong>
+        </div>
+      </div>
+      <button type="button" id="btnCloseRecap" class="btn btn-ghost btn-sm">TUTUP REKAP</button>
+    </div>
+  </div>
 
   <script src="js/state.js"></script>
   <script src="js/timer.js"></script>
@@ -89,6 +153,7 @@
   <script src="js/juri.js"></script>
   <script src="js/monitor.js"></script>
   <script src="js/sekretaris.js"></script>
+  <script src="js/bracket.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

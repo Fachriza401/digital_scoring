@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#05060a">
+<meta name="theme-color" content="#0B0F19">
 <title>Dewan — IPSI Scoring Live Digital</title>
 <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
 <link rel="stylesheet" href="css/global.css">
@@ -20,6 +20,7 @@
       <span class="navbar-badge">Active: Dewan View</span>
     </div>
     <div class="navbar-right">
+      <a class="navbar-back" href="bracket.html">BAGAN</a>
       <button type="button" class="btn-fs" data-action="fullscreen">FULLSCREEN</button>
       <span class="navbar-unlock">SYSTEM UNLOCKED</span>
     </div>
@@ -53,20 +54,28 @@
         <button type="button" id="btnPause" class="btn btn-primary" aria-label="Jeda timer">PAUSE</button>
         <button type="button" id="btnResetTimer" class="btn btn-ghost" aria-label="Reset timer">RESET</button>
         <button type="button" id="btnSetDuration" class="btn btn-ghost" aria-label="Atur durasi">SET DURATION</button>
+        <button type="button" id="btnEmergency" class="btn btn-danger" aria-label="Hentikan timer darurat">EMERGENCY PAUSE</button>
         <div id="roundChips" class="chips" role="group" aria-label="Pilih babak"></div>
       </div>
-      <div class="timer-track" aria-hidden="true"><div id="timerBar" class="timer-bar"></div></div>
+      <div class="timer-track" aria-hidden="true"><div id="timerBar"></div></div>
     </section>
 
     <section class="dewan-grid">
       <aside class="team-slot team-slot--blue">
         <article class="team-panel team-panel--blue">
           <header class="team-head">
-            <span class="team-dot"></span>
-            <div>
+            <div class="team-logo team-logo--club" title="Logo perguruan biru">
+              <img id="blueClubLogo" alt="Logo perguruan sudut biru">
+              <span>LOGO</span>
+            </div>
+            <div class="team-ident">
               <span class="mini-label">SUDUT BIRU</span>
               <h2 id="blueName" class="team-name">PESILAT BIRU</h2>
               <span id="blueContingent" class="team-contingent">KONTINGEN BIRU</span>
+            </div>
+            <div class="team-logo team-logo--contingent" title="Logo kontingen biru">
+              <img id="blueContingentLogo" alt="Logo kontingen sudut biru">
+              <span>DAERAH</span>
             </div>
             <span id="blueDq" class="dq-badge" hidden>DISK</span>
           </header>
@@ -107,11 +116,18 @@
       <aside class="team-slot team-slot--red">
         <article class="team-panel team-panel--red">
           <header class="team-head">
-            <span class="team-dot"></span>
-            <div>
+            <div class="team-logo team-logo--club" title="Logo perguruan merah">
+              <img id="redClubLogo" alt="Logo perguruan sudut merah">
+              <span>LOGO</span>
+            </div>
+            <div class="team-ident">
               <span class="mini-label">SUDUT MERAH</span>
               <h2 id="redName" class="team-name">PESILAT MERAH</h2>
               <span id="redContingent" class="team-contingent">KONTINGEN MERAH</span>
+            </div>
+            <div class="team-logo team-logo--contingent" title="Logo kontingen merah">
+              <img id="redContingentLogo" alt="Logo kontingen sudut merah">
+              <span>DAERAH</span>
             </div>
             <span id="redDq" class="dq-badge" hidden>DISK</span>
           </header>
@@ -130,15 +146,47 @@
         </article>
       </aside>
     </section>
+
+    <section class="panel timeline-panel" aria-label="Timeline keputusan dewan">
+      <header class="timeline-head">
+        <div>
+          <h2 class="section-heading">TIMELINE KEPUTUSAN DEWAN</h2>
+          <p class="timeline-help">Riwayat teguran, peringatan, jatuhan, verifikasi, dan emergency pause.</p>
+        </div>
+        <div class="timeline-actions">
+          <div class="timeline-filters" role="group" aria-label="Filter timeline">
+            <button type="button" class="timeline-filter is-active" data-filter="all">SEMUA</button>
+            <button type="button" class="timeline-filter" data-filter="blue">BIRU</button>
+            <button type="button" class="timeline-filter" data-filter="red">MERAH</button>
+          </div>
+          <button type="button" id="btnClearTimeline" class="btn btn-ghost btn-sm">BERSIHKAN</button>
+        </div>
+      </header>
+      <div id="decisionTimeline" class="timeline-list" aria-live="polite"></div>
+    </section>
   </main>
 
   <div id="resetModal" class="modal-backdrop" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
-      <h2 id="resetTitle" class="modal-title">RESET PERTANDINGAN?</h2>
-      <p class="modal-text">Seluruh skor, timer, log dan penilaian akan dikembalikan ke kondisi awal.</p>
-      <div class="modal-actions">
-        <button type="button" id="btnResetCancel" class="btn btn-ghost">BATAL</button>
-        <button type="button" id="btnResetConfirm" class="btn btn-danger">RESET</button>
+      <div id="resetStep1">
+        <h2 id="resetTitle" class="modal-title">RESET PERTANDINGAN?</h2>
+        <p class="modal-text">Seluruh skor, timer, log, dan penilaian akan dikembalikan ke kondisi awal.</p>
+        <div class="modal-actions">
+          <button type="button" id="btnResetCancel" class="btn btn-ghost">BATAL</button>
+          <button type="button" id="btnResetContinue" class="btn btn-danger">LANJUT KONFIRMASI</button>
+        </div>
+      </div>
+      <div id="resetStep2" hidden>
+        <h2 class="modal-title">KONFIRMASI KEDUA</h2>
+        <p class="modal-text">Ketik <strong>RESET</strong> untuk mengaktifkan tombol konfirmasi.</p>
+        <div class="field">
+          <label for="resetConfirmText">KONFIRMASI</label>
+          <input type="text" id="resetConfirmText" class="input" autocomplete="off" placeholder="RESET">
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="btnResetBack" class="btn btn-ghost">KEMBALI</button>
+          <button type="button" id="btnResetConfirm" class="btn btn-danger" disabled>KONFIRMASI RESET</button>
+        </div>
       </div>
     </div>
   </div>
@@ -180,6 +228,7 @@
   <script src="js/juri.js"></script>
   <script src="js/monitor.js"></script>
   <script src="js/sekretaris.js"></script>
+  <script src="js/bracket.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

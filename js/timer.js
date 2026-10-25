@@ -11,6 +11,22 @@
     return Math.max(0, t.remaining - elapsed);
   }
 
+  function getDisplayRemainingPrecise(state) {
+    var t = state.timer;
+    if (!t.running) return t.remaining;
+    if (!t.startedAt) return t.remaining;
+    var elapsed = (Date.now() - t.startedAt) / 1000;
+    return Math.max(0, t.remaining - elapsed);
+  }
+
+  function formatClock(seconds, showTenths) {
+    var safe = Math.max(0, seconds);
+    if (showTenths && safe > 0 && safe < 10) {
+      return "00:0" + safe.toFixed(1);
+    }
+    return formatMMSS(safe);
+  }
+
   function formatMMSS(seconds) {
     var s = Math.max(0, Math.floor(seconds));
     var m = Math.floor(s / 60);
@@ -34,6 +50,7 @@
       s.timer.running = true;
       s.timer.startedAt = Date.now();
       s.timer.status = "RUNNING";
+      s.timer.emergency = false;
     });
   }
 
@@ -55,6 +72,7 @@
       s.timer.running = false;
       s.timer.startedAt = null;
       s.timer.status = "READY";
+      s.timer.emergency = false;
     });
   }
 
@@ -67,7 +85,33 @@
       s.timer.running = false;
       s.timer.startedAt = null;
       s.timer.status = "READY";
+      s.timer.emergency = false;
     });
+  }
+
+  function adjust(deltaSeconds) {
+    var delta = Math.floor(Number(deltaSeconds) || 0);
+    if (!delta) return;
+    var state = global.IPSI.State.getState();
+    var current = getDisplayRemainingPrecise(state);
+    var next = Math.min(state.timer.duration, Math.max(1, current + delta));
+    global.IPSI.State.updateState(function (s) {
+      s.timer.remaining = Math.round(next);
+      if (s.timer.running) s.timer.startedAt = Date.now();
+      if (s.timer.status === "FINISHED" && next > 0) s.timer.status = s.timer.running ? "RUNNING" : "PAUSED";
+    });
+  }
+
+  function emergencyPause() {
+    global.IPSI.State.actions.setEmergency(true);
+  }
+
+  function clearEmergency() {
+    global.IPSI.State.actions.setEmergency(false);
+  }
+
+  function isEmergency() {
+    return global.IPSI.State.getState().timer.emergency === true;
   }
 
   function toggle() {
@@ -93,6 +137,7 @@
             s.timer.running = false;
             s.timer.startedAt = null;
             s.timer.status = "FINISHED";
+            s.timer.emergency = false;
           });
         } else if (typeof onTick === "function") {
           onTick(remaining);
@@ -109,8 +154,14 @@
     reset: reset,
     toggle: toggle,
     setDuration: setDuration,
+    adjust: adjust,
+    emergencyPause: emergencyPause,
+    clearEmergency: clearEmergency,
+    isEmergency: isEmergency,
     formatMMSS: formatMMSS,
+    formatClock: formatClock,
     getDisplayRemaining: getDisplayRemaining,
+    getDisplayRemainingPrecise: getDisplayRemainingPrecise,
     startTicker: startTicker
   };
 })(window);

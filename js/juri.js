@@ -5,6 +5,8 @@
   var Timer = global.IPSI.Timer;
   var U = null;
   var el = {};
+  var lastHit = {};
+  var DEBOUNCE_MS = 280;
 
   function grab(ids) {
     ids.forEach(function (id) {
@@ -25,6 +27,7 @@
       "miEventName", "miMatchLine", "miRoundLabel", "miStatus", "miTimer", "miCategory",
       "activeJudgeLabel", "judgeAthleteLabel",
       "blueName", "redName", "blueContingent", "redContingent", "blueDq", "redDq",
+      "blueClubLogo", "redClubLogo", "blueContingentLogo", "redContingentLogo",
       "blueCounters", "redCounters", "blueButtons", "redButtons",
       "btnBluePunch", "btnBlueKick", "btnRedPunch", "btnRedKick",
       "btnExit",
@@ -64,21 +67,33 @@
   }
 
   function score(teamKey, type) {
+    var node = teamKey === "blue"
+      ? (type === "kick" ? el.btnBlueKick : el.btnBluePunch)
+      : (type === "kick" ? el.btnRedKick : el.btnRedPunch);
+    var key = teamKey + ":" + type;
+    var now = Date.now();
+    if (lastHit[key] && now - lastHit[key] < DEBOUNCE_MS) return;
+    lastHit[key] = now;
+
     var state = State.getState();
     var team = teamKey === "blue" ? state.teamBlue : state.teamRed;
     if (!state.timer.running) {
       U.toast("TIMER BELUM AKTIF", "error");
+      pulse(node, false);
       return;
     }
     if (team.disqualified) {
       U.toast("SUDUT TERDISKUALIFIKASI", "error");
+      pulse(node, false);
       return;
     }
     if (type === "punch") State.actions.addPunch(teamKey);
     else State.actions.addKick(teamKey);
-    pop(teamKey === "blue"
-      ? (type === "kick" ? el.btnBlueKick : el.btnBluePunch)
-      : (type === "kick" ? el.btnRedKick : el.btnRedPunch));
+    pop(node);
+    pulse(node, true);
+    if (global.navigator && typeof global.navigator.vibrate === "function") {
+      try { global.navigator.vibrate(18); } catch (e) {}
+    }
   }
 
   function pop(node) {
@@ -86,6 +101,21 @@
     node.classList.remove("pop");
     void node.offsetWidth;
     node.classList.add("pop");
+  }
+
+  function pulse(node, accepted) {
+    if (!node) return;
+    node.classList.remove("is-hit", "is-rejected");
+    void node.offsetWidth;
+    node.classList.add(accepted ? "is-hit" : "is-rejected");
+    var value = document.createElement("span");
+    value.className = "hit-pop" + (accepted ? "" : " hit-pop--rejected");
+    value.textContent = accepted ? node.querySelector(".sb-value").textContent : "!";
+    node.appendChild(value);
+    setTimeout(function () {
+      if (value.parentNode) value.parentNode.removeChild(value);
+      node.classList.remove("is-hit", "is-rejected");
+    }, 520);
   }
 
   function render(state) {
@@ -103,8 +133,8 @@
     if (el.activeJudgeLabel) el.activeJudgeLabel.textContent = "JURI " + String(state.judgeActive || "judge1").replace("judge", "");
     if (el.judgeAthleteLabel) el.judgeAthleteLabel.textContent = "Atlet: " + ev.category.replace(/^TANDING\s+/i, "");
     if (el.miStatus) {
-      el.miStatus.className = "status-pill status-" + global.IPSI.Utils.statusClass(state.timer.status);
-      el.miStatus.textContent = state.timer.status;
+      el.miStatus.className = "status-pill status-" + global.IPSI.Utils.statusClass(state.timer.emergency ? "PAUSED" : state.timer.status);
+      el.miStatus.textContent = state.timer.emergency ? "MEDIS" : state.timer.status;
     }
   }
 
@@ -116,19 +146,41 @@
   }
 
   function renderTeam(team, teamKey) {
+    var state = State.getState();
     if (teamKey === "blue") {
-      if (el.blueName) el.blueName.textContent = team.name;
+      if (el.blueName) {
+        el.blueName.textContent = team.name;
+        U.fitText(el.blueName, { min: 13, max: 22 });
+      }
       if (el.blueContingent) el.blueContingent.textContent = team.contingent;
       if (el.blueDq) el.blueDq.hidden = !team.disqualified;
+      setLogo(el.blueClubLogo, state.event.blueLogo);
+      setLogo(el.blueContingentLogo, state.event.blueContingentLogo);
       renderCounters(el.blueCounters, team);
     } else {
-      if (el.redName) el.redName.textContent = team.name;
+      if (el.redName) {
+        el.redName.textContent = team.name;
+        U.fitText(el.redName, { min: 13, max: 22 });
+      }
       if (el.redContingent) el.redContingent.textContent = team.contingent;
       if (el.redDq) el.redDq.hidden = !team.disqualified;
+      setLogo(el.redClubLogo, state.event.redLogo);
+      setLogo(el.redContingentLogo, state.event.redContingentLogo);
       renderCounters(el.redCounters, team);
     }
     var panel = document.querySelector(".corner--" + teamKey);
     if (panel) panel.classList.toggle("is-disqualified", team.disqualified);
+  }
+
+  function setLogo(node, src) {
+    if (!node) return;
+    if (src) {
+      node.src = src;
+      node.classList.add("has-image");
+    } else {
+      node.removeAttribute("src");
+      node.classList.remove("has-image");
+    }
   }
 
   function renderCounters(root, team) {

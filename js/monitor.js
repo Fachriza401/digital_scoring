@@ -5,6 +5,8 @@
   var Timer = global.IPSI.Timer;
   var U = null;
   var el = {};
+  var recapKey = "";
+  var recapHideTimer = null;
 
   function grab(ids) {
     ids.forEach(function (id) {
@@ -16,10 +18,18 @@
     U = global.IPSI.Utils;
     grab([
       "miEventName", "miStatus", "miBlueName", "miBlueContingent", "miBlueScore", "miBlueDq",
+      "miBlueBinaan", "miBlueTeguran", "miBluePeringatan",
       "miRedName", "miRedContingent", "miRedScore", "miRedDq",
-      "miRoundLabel", "miTimer", "miMatchLine", "miClock", "miDate"
-       , "miBlueJudges", "miRedJudges"
+      "miRedBinaan", "miRedTeguran", "miRedPeringatan",
+      "miBlueClubLogo", "miRedClubLogo", "miBlueContingentLogo", "miRedContingentLogo",
+      "miRoundLabel", "miTimer", "miMatchLine", "miClock", "miDate",
+      "miBlueJudges", "miRedJudges",
+      "emergencyOverlay", "roundRecap", "recapKicker", "recapTitle",
+      "recapBlueName", "recapBlueScore", "recapRedName", "recapRedScore",
+      "recapRoundScore", "recapWinner", "btnCloseRecap"
     ]);
+
+    if (el.btnCloseRecap) el.btnCloseRecap.addEventListener("click", hideRecap);
 
     State.subscribe(render);
     render(State.getState());
@@ -40,16 +50,81 @@
     if (el.miMatchLine) el.miMatchLine.textContent = ev.match + "  |  " + ev.category;
     if (el.miRoundLabel) el.miRoundLabel.textContent = "BABAK " + state.round;
     if (el.miStatus) {
-      el.miStatus.className = "status-pill status-" + global.IPSI.Utils.statusClass(state.timer.status);
-      el.miStatus.textContent = state.timer.status;
+      el.miStatus.className = "status-pill status-" + global.IPSI.Utils.statusClass(state.timer.emergency ? "PAUSED" : state.timer.status);
+      el.miStatus.textContent = state.timer.emergency ? "MEDIS" : state.timer.status;
     }
 
     renderBoard("blue", state.teamBlue);
     renderBoard("red", state.teamRed);
     renderJudgeRecap(state, "blue");
     renderJudgeRecap(state, "red");
+    renderEmergency(state);
+    renderRecap(state);
 
     renderTimerDisplay(Timer.getDisplayRemaining(state));
+  }
+
+  function setLogo(node, src) {
+    if (!node) return;
+    if (src) {
+      node.src = src;
+      node.classList.add("has-image");
+    } else {
+      node.removeAttribute("src");
+      node.classList.remove("has-image");
+    }
+  }
+
+  function renderEmergency(state) {
+    if (!el.emergencyOverlay) return;
+    el.emergencyOverlay.hidden = state.timer.emergency !== true;
+  }
+
+  function showRecap(state) {
+    if (!el.roundRecap) return;
+    var totals = State.getRoundTotals(state);
+    var current = totals[String(state.round)] || { blue: 0, red: 0 };
+    if (el.recapKicker) el.recapKicker.textContent = "REKAP BABAK " + state.round;
+    if (el.recapTitle) el.recapTitle.textContent = "AKHIR BABAK";
+    if (el.recapBlueName) el.recapBlueName.textContent = state.teamBlue.name;
+    if (el.recapRedName) el.recapRedName.textContent = state.teamRed.name;
+    if (el.recapBlueScore) el.recapBlueScore.textContent = state.teamBlue.score;
+    if (el.recapRedScore) el.recapRedScore.textContent = state.teamRed.score;
+    if (el.recapRoundScore) el.recapRoundScore.textContent = fmtScore(current.blue) + " - " + fmtScore(current.red);
+    if (el.recapWinner) {
+      el.recapWinner.textContent =
+        state.teamBlue.score === state.teamRed.score ? "SKOR SERI"
+          : state.teamBlue.score > state.teamRed.score ? "BIRU UNGGUL" : "MERAH UNGGUL";
+    }
+    el.roundRecap.hidden = false;
+    if (recapHideTimer) clearTimeout(recapHideTimer);
+    recapHideTimer = setTimeout(hideRecap, 10000);
+  }
+
+  function hideRecap() {
+    if (el.roundRecap) el.roundRecap.hidden = true;
+    if (recapHideTimer) {
+      clearTimeout(recapHideTimer);
+      recapHideTimer = null;
+    }
+  }
+
+  function renderRecap(state) {
+    if (!el.roundRecap) return;
+    if (state.timer.status === "FINISHED") {
+      var key = state.round + ":" + state.timer.duration + ":" + (state.history || []).length;
+      if (key !== recapKey) {
+        recapKey = key;
+        showRecap(state);
+      }
+    } else if (!state.timer.emergency) {
+      hideRecap();
+    }
+  }
+
+  function fmtScore(value) {
+    var n = Math.round(Number(value) || 0);
+    return n > 0 ? "+" + n : String(n);
   }
 
    function renderJudgeRecap(state, teamKey) {
@@ -73,18 +148,41 @@
      });
    }
   function renderBoard(teamKey, team) {
+    var state = State.getState();
     if (teamKey === "blue") {
-      if (el.miBlueName) el.miBlueName.textContent = team.name;
-      if (el.miBlueContingent) el.miBlueContingent.textContent = team.contingent;
+      if (el.miBlueName) {
+        el.miBlueName.textContent = team.name;
+        U.fitText(el.miBlueName, { min: 18, max: 34 });
+      }
+      if (el.miBlueContingent) {
+        el.miBlueContingent.textContent = team.contingent;
+        U.fitText(el.miBlueContingent, { min: 10, max: 15 });
+      }
+      if (el.miBlueBinaan) el.miBlueBinaan.textContent = Number(team.binaan1 || 0) + Number(team.binaan2 || 0);
+      if (el.miBlueTeguran) el.miBlueTeguran.textContent = Number(team.teguran1 || 0) + Number(team.teguran2 || 0) + Number(team.teguran3 || 0);
+      if (el.miBluePeringatan) el.miBluePeringatan.textContent = Number(team.peringatan1 || 0) + Number(team.peringatan2 || 0) + Number(team.peringatan3 || 0);
       if (el.miBlueDq) el.miBlueDq.hidden = !team.disqualified;
+      setLogo(el.miBlueClubLogo, state.event.blueLogo);
+      setLogo(el.miBlueContingentLogo, state.event.blueContingentLogo);
       if (el.miBlueScore && el.miBlueScore.textContent !== String(team.score)) {
         el.miBlueScore.textContent = team.score;
         pop(el.miBlueScore);
       }
     } else {
-      if (el.miRedName) el.miRedName.textContent = team.name;
-      if (el.miRedContingent) el.miRedContingent.textContent = team.contingent;
+      if (el.miRedName) {
+        el.miRedName.textContent = team.name;
+        U.fitText(el.miRedName, { min: 18, max: 34 });
+      }
+      if (el.miRedContingent) {
+        el.miRedContingent.textContent = team.contingent;
+        U.fitText(el.miRedContingent, { min: 10, max: 15 });
+      }
+      if (el.miRedBinaan) el.miRedBinaan.textContent = Number(team.binaan1 || 0) + Number(team.binaan2 || 0);
+      if (el.miRedTeguran) el.miRedTeguran.textContent = Number(team.teguran1 || 0) + Number(team.teguran2 || 0) + Number(team.teguran3 || 0);
+      if (el.miRedPeringatan) el.miRedPeringatan.textContent = Number(team.peringatan1 || 0) + Number(team.peringatan2 || 0) + Number(team.peringatan3 || 0);
       if (el.miRedDq) el.miRedDq.hidden = !team.disqualified;
+      setLogo(el.miRedClubLogo, state.event.redLogo);
+      setLogo(el.miRedContingentLogo, state.event.redContingentLogo);
       if (el.miRedScore && el.miRedScore.textContent !== String(team.score)) {
         el.miRedScore.textContent = team.score;
         pop(el.miRedScore);
@@ -103,10 +201,12 @@
   function renderTimerDisplay(remaining) {
     var s = State.getState();
     if (!el.miTimer) return;
-    var fmt = Timer.formatMMSS(remaining);
+    var precise = Timer.getDisplayRemainingPrecise(s);
+    var fmt = Timer.formatClock(precise, true);
     if (el.miTimer.textContent !== fmt) el.miTimer.textContent = fmt;
     el.miTimer.classList.toggle("is-warning", s.timer.status === "PAUSED");
     el.miTimer.classList.toggle("is-finished", s.timer.status === "FINISHED");
+    el.miTimer.classList.toggle("is-emergency", s.timer.emergency === true);
   }
 
   function updateClock() {

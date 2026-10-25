@@ -341,3 +341,101 @@
   .page-juri.mobile-focus .corner { min-height:calc(100vh - 65px); }
   .page-juri.mobile-focus .score-big { min-height:calc((100vh - 105px) / 2); }
 }
+/* ---- professional tournament overrides ---- */
+.page-juri {
+  background:
+    linear-gradient(180deg,rgba(59,130,246,0.045),transparent 300px),
+    var(--bg-primary);
+}
+.page-juri .juri-grid { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+.page-juri .corner {
+  border-width:1px;
+  box-shadow:var(--glow-sm);
+}
+.page-juri .corner--blue {
+  border-color:rgba(59,130,246,0.55);
+  background:linear-gradient(180deg,rgba(59,130,246,0.13),rgba(17,24,39,0.98) 42%);
+}
+.page-juri .corner--red {
+  border-color:rgba(239,68,68,0.55);
+  background:linear-gradient(180deg,rgba(239,68,68,0.12),rgba(17,24,39,0.98) 42%);
+}
+.page-juri .corner-head { gap:0.55rem; flex-wrap:nowrap; }
+.page-juri .corner-ident { flex:1; min-width:0; }
+.page-juri .corner-name {
+  line-height:1.15;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.page-juri .corner-contingent {
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.page-juri .dq-badge { box-shadow:none; margin-left:0; }
+.page-juri .score-big {
+  position:relative;
+  overflow:hidden;
+  box-shadow:none;
+  isolation:isolate;
+}
+.page-juri .score-big--blue {
+  background:#2563EB;
+  border-color:#3B82F6;
+  box-shadow:none;
+}
+.page-juri .score-big--red {
+  background:#DC2626;
+  border-color:#EF4444;
+  box-shadow:none;
+}
+.page-juri .score-big.is-hit { animation:judgeHit 0.22s ease-out; }
+.page-juri .score-big.is-rejected { animation:judgeReject 0.22s ease-out; }
+.page-juri .score-big.is-hit::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  border:3px solid rgba(255,255,255,0.85);
+  border-radius:inherit;
+  animation:judgeRing 0.4s ease-out forwards;
+  pointer-events:none;
+}
+.page-juri .hit-pop {
+  position:absolute;
+  left:50%;
+  top:48%;
+  transform:translate(-50%,-50%);
+  z-index:2;
+  font-family:var(--font-num);
+  font-size:2.4rem;
+  font-weight:900;
+  color:#fff;
+  text-shadow:0 2px 8px rgba(0,0,0,0.4);
+  animation:hitFloat 0.5s ease-out forwards;
+  pointer-events:none;
+}
+.page-juri .hit-pop--rejected { color:#FDE68A; font-size:2rem; }
+@keyframes judgeHit { 0%{transform:scale(1)} 45%{transform:scale(0.96)} 100%{transform:scale(1)} }
+@keyframes judgeReject { 0%{transform:translateX(0)} 30%{transform:translateX(-5px)} 60%{transform:translateX(5px)} 100%{transform:translateX(0)} }
+@keyframes judgeRing { from{opacity:1;transform:scale(0.92)} to{opacity:0;transform:scale(1.04)} }
+@keyframes hitFloat { from{opacity:1;transform:translate(-50%,-50%) scale(0.8)} to{opacity:0;transform:translate(-50%,-95%) scale(1.15)} }
+.page-juri .active-judge-label { background:var(--blue) !important; }
+.page-juri .match-timer.is-emergency { color:var(--red-bright); }
+
+@media (min-width:900px) {
+  .page-juri .juri-grid { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+  .page-juri .corner { grid-row:auto; min-height:calc(100vh - 145px); }
+  .page-juri .corner-buttons { grid-template-columns:1fr 1fr; }
+  .page-juri .score-big { min-height:calc(50vh - 90px); }
+}
+@media (max-width:899px) {
+  .page-juri .juri-grid { grid-template-columns:1fr; }
+  .page-juri .corner-buttons { grid-template-columns:1fr 1fr; }
+}
+@media (max-width:600px) {
+  .page-juri .corner-head { flex-wrap:wrap; }
+  .page-juri .corner-ident { flex-basis:100%; order:3; }
+  .page-juri .corner-buttons { grid-template-columns:1fr; }
+}

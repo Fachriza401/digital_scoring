@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#05060a">
+<meta name="theme-color" content="#0B0F19">
 <title>Sekretaris — IPSI Scoring Live Digital</title>
 <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
 <link rel="stylesheet" href="css/global.css">
@@ -20,6 +20,7 @@
       <span class="navbar-badge">Active: Sekretaris View</span>
     </div>
     <div class="navbar-right">
+      <a class="navbar-back" href="bracket.html">BAGAN PERTANDINGAN</a>
       <button type="button" class="btn-fs" data-action="fullscreen">FULLSCREEN</button>
       <span class="navbar-unlock">SYSTEM UNLOCKED</span>
     </div>
@@ -45,48 +46,102 @@
 
         <div class="field">
           <label for="fEventName">NAMA EVENT</label>
-          <input type="text" id="fEventName" class="input" maxlength="40" autocomplete="off">
+          <input type="text" id="fEventName" class="input" maxlength="80" autocomplete="off">
         </div>
         <div class="field-row">
           <div class="field">
             <label for="fMatch">NOMOR PARTAI</label>
-            <input type="text" id="fMatch" class="input" maxlength="40" autocomplete="off">
+            <input type="text" id="fMatch" class="input" maxlength="80" autocomplete="off">
           </div>
           <div class="field">
             <label for="fSchedule">JADWAL</label>
-            <input type="text" id="fSchedule" class="input" maxlength="40" autocomplete="off" placeholder="cth: 08:30 WIB">
+            <input type="text" id="fSchedule" class="input" maxlength="80" autocomplete="off" placeholder="cth: 08:30 WIB">
           </div>
         </div>
 
-        <div class="field-pair">
-          <div class="field">
-            <label for="fBlueName">ATLET BIRU</label>
-            <input type="text" id="fBlueName" class="input" maxlength="40" autocomplete="off">
+        <div class="team-form team-form--blue">
+          <div class="team-form-head"><span class="team-dot"></span> SUDUT BIRU</div>
+          <div class="field-pair">
+            <div class="field">
+              <label for="fBlueName">ATLET BIRU</label>
+              <input type="text" id="fBlueName" class="input" maxlength="80" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="fBlueContingent">KONTINGEN / DAERAH BIRU</label>
+              <input type="text" id="fBlueContingent" class="input" maxlength="80" autocomplete="off">
+            </div>
           </div>
-          <div class="field">
-            <label for="fRedName">ATLET MERAH</label>
-            <input type="text" id="fRedName" class="input" maxlength="40" autocomplete="off">
+          <div class="logo-form-row">
+            <div class="logo-picker">
+              <span class="mini-label">LOGO PERGURUAN</span>
+              <div class="logo-picker-body">
+                <img id="pvBlueLogo" class="logo-preview" alt="Pratinjau logo perguruan biru">
+                <label class="btn btn-ghost btn-sm file-label" for="fBlueLogo">PILIH LOGO
+                  <input type="file" id="fBlueLogo" accept="image/*" hidden>
+                </label>
+                <button type="button" class="btn btn-ghost btn-sm" data-clear-logo="blueLogo">HAPUS</button>
+              </div>
+            </div>
+            <div class="logo-picker">
+              <span class="mini-label">LOGO KONTINGEN</span>
+              <div class="logo-picker-body">
+                <img id="pvBlueContingentLogo" class="logo-preview" alt="Pratinjau logo kontingen biru">
+                <label class="btn btn-ghost btn-sm file-label" for="fBlueContingentLogo">PILIH LOGO
+                  <input type="file" id="fBlueContingentLogo" accept="image/*" hidden>
+                </label>
+                <button type="button" class="btn btn-ghost btn-sm" data-clear-logo="blueContingentLogo">HAPUS</button>
+              </div>
+            </div>
           </div>
-          <div class="field">
-            <label for="fBlueContingent">KONTINGEN BIRU</label>
-            <input type="text" id="fBlueContingent" class="input" maxlength="40" autocomplete="off">
+        </div>
+
+        <div class="team-form team-form--red">
+          <div class="team-form-head"><span class="team-dot"></span> SUDUT MERAH</div>
+          <div class="field-pair">
+            <div class="field">
+              <label for="fRedName">ATLET MERAH</label>
+              <input type="text" id="fRedName" class="input" maxlength="80" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="fRedContingent">KONTINGEN / DAERAH MERAH</label>
+              <input type="text" id="fRedContingent" class="input" maxlength="80" autocomplete="off">
+            </div>
           </div>
-          <div class="field">
-            <label for="fRedContingent">KONTINGEN MERAH</label>
-            <input type="text" id="fRedContingent" class="input" maxlength="40" autocomplete="off">
+          <div class="logo-form-row">
+            <div class="logo-picker">
+              <span class="mini-label">LOGO PERGURUAN</span>
+              <div class="logo-picker-body">
+                <img id="pvRedLogo" class="logo-preview" alt="Pratinjau logo perguruan merah">
+                <label class="btn btn-ghost btn-sm file-label" for="fRedLogo">PILIH LOGO
+                  <input type="file" id="fRedLogo" accept="image/*" hidden>
+                </label>
+                <button type="button" class="btn btn-ghost btn-sm" data-clear-logo="redLogo">HAPUS</button>
+              </div>
+            </div>
+            <div class="logo-picker">
+              <span class="mini-label">LOGO KONTINGEN</span>
+              <div class="logo-picker-body">
+                <img id="pvRedContingentLogo" class="logo-preview" alt="Pratinjau logo kontingen merah">
+                <label class="btn btn-ghost btn-sm file-label" for="fRedContingentLogo">PILIH LOGO
+                  <input type="file" id="fRedContingentLogo" accept="image/*" hidden>
+                </label>
+                <button type="button" class="btn btn-ghost btn-sm" data-clear-logo="redContingentLogo">HAPUS</button>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="field-row">
           <div class="field">
-            <label for="fCategory">KATEGORI</label>
-            <input type="text" id="fCategory" class="input" maxlength="40" autocomplete="off">
+            <label for="fCategory">KATEGORI / KELAS TANDING</label>
+            <input type="text" id="fCategory" class="input" maxlength="80" autocomplete="off" list="classSuggestions">
+            <datalist id="classSuggestions"></datalist>
           </div>
         </div>
 
-        <div class="field-row">
+        <div class="field-row field-row--duration">
           <div class="field">
-            <label for="fDurMin">DURASI TANDING (MENIT)</label>
+            <label for="fDurMin">DURASI (MENIT)</label>
             <input type="number" id="fDurMin" class="input" min="0" max="99" step="1" inputmode="numeric">
           </div>
           <div class="field">
@@ -98,11 +153,49 @@
             <input type="number" id="fRounds" class="input" min="1" max="9" step="1" inputmode="numeric">
           </div>
         </div>
+        <div class="duration-tools">
+          <button type="button" class="btn btn-ghost btn-sm" id="btnDurMinus">-10 DETIK</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btnDurPlus">+10 DETIK</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btnApplyDuration">TERAPKAN DURASI</button>
+        </div>
 
         <div class="form-actions">
           <button type="button" id="btnSave" class="btn btn-primary">SIMPAN PERTANDINGAN</button>
           <button type="button" id="btnStart" class="btn btn-gold">MULAI PERTANDINGAN</button>
+          <button type="button" id="btnResetMatch" class="btn btn-danger">RESET MATCH</button>
         </div>
+      </article>
+
+      <article class="panel panel--classes">
+        <h2 class="section-heading">MANAJEMEN KELAS TANDING</h2>
+        <div class="class-form">
+          <div class="field-row">
+            <div class="field">
+              <label for="clsName">NAMA KELAS</label>
+              <input type="text" id="clsName" class="input" maxlength="80" placeholder="cth: TANDING PUTRA - KELAS A">
+            </div>
+            <div class="field">
+              <label for="clsGender">KATEGORI</label>
+              <select id="clsGender" class="input">
+                <option value="PUTRA">PUTRA</option>
+                <option value="PUTRI">PUTRI</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="clsMin">BERAT MIN (KG)</label>
+              <input type="number" id="clsMin" class="input" min="0" max="200" step="1" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="clsMax">BERAT MAKS (KG)</label>
+              <input type="number" id="clsMax" class="input" min="0" max="200" step="1" inputmode="numeric">
+            </div>
+          </div>
+          <button type="button" id="btnAddClass" class="btn btn-primary btn-block">TAMBAH KELAS</button>
+        </div>
+        <div id="classList" class="class-list" aria-live="polite"></div>
+        <a class="btn btn-ghost btn-block" href="bracket.html">KELOLA BAGAN &amp; PESERTA</a>
       </article>
 
       <article class="panel panel--control">
@@ -124,6 +217,12 @@
             <button type="button" id="btnPlay" class="btn btn-gold">PLAY</button>
             <button type="button" id="btnPause" class="btn btn-primary">PAUSE</button>
             <button type="button" id="btnResetTimer" class="btn btn-ghost">RESET</button>
+          </div>
+          <div class="control-btns control-btns--compact">
+            <button type="button" class="btn btn-ghost btn-sm" data-timer-adjust="-10">-10s</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-timer-adjust="-1">-1s</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-timer-adjust="1">+1s</button>
+            <button type="button" class="btn btn-ghost btn-sm" data-timer-adjust="10">+10s</button>
           </div>
           <div id="roundChips" class="chips" role="group" aria-label="Pilih babak"></div>
         </div>
@@ -153,7 +252,7 @@
           <button type="button" id="btnRedWinner" class="btn btn-red">MERAH MENANG</button>
           <button type="button" id="btnDrawWinner" class="btn btn-ghost btn-block">HASIL SERI</button>
         </div>
-        <p class="result-note">Setelah pemenang ditetapkan, rekam tanding otomatis disimpan ke histori.</p>
+        <p class="result-note">Pemenang otomatis diteruskan ke kotak pertandingan berikutnya pada bagan.</p>
       </article>
 
       <article class="panel panel--history">
@@ -165,11 +264,25 @@
 
   <div id="resetModal" class="modal-backdrop" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
-      <h2 id="resetTitle" class="modal-title">RESET PERTANDINGAN?</h2>
-      <p class="modal-text">Seluruh skor, timer, log dan penilaian akan dikembalikan ke kondisi awal.</p>
-      <div class="modal-actions">
-        <button type="button" id="btnResetCancel" class="btn btn-ghost">BATAL</button>
-        <button type="button" id="btnResetConfirm" class="btn btn-danger">RESET</button>
+      <div id="resetStep1">
+        <h2 id="resetTitle" class="modal-title">RESET PERTANDINGAN?</h2>
+        <p class="modal-text">Seluruh skor, timer, log, dan penilaian akan dikembalikan ke kondisi awal. Nama atlet dan data event tetap disimpan.</p>
+        <div class="modal-actions">
+          <button type="button" id="btnResetCancel" class="btn btn-ghost">BATAL</button>
+          <button type="button" id="btnResetContinue" class="btn btn-danger">LANJUT KONFIRMASI</button>
+        </div>
+      </div>
+      <div id="resetStep2" hidden>
+        <h2 class="modal-title">KONFIRMASI KEDUA</h2>
+        <p class="modal-text">Ketik <strong>RESET</strong> pada kolom di bawah untuk mengaktifkan tombol konfirmasi.</p>
+        <div class="field">
+          <label for="resetConfirmText">KONFIRMASI</label>
+          <input type="text" id="resetConfirmText" class="input" autocomplete="off" placeholder="RESET">
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="btnResetBack" class="btn btn-ghost">KEMBALI</button>
+          <button type="button" id="btnResetConfirm" class="btn btn-danger" disabled>KONFIRMASI RESET</button>
+        </div>
       </div>
     </div>
   </div>
@@ -177,7 +290,7 @@
   <div id="resetAllModal" class="modal-backdrop" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="resetAllTitle">
       <h2 id="resetAllTitle" class="modal-title">RESET SEMUA DATA?</h2>
-      <p class="modal-text">Seluruh data event, skor, timer dan log akan dihapus dan kembali ke kondisi awal sistem.</p>
+      <p class="modal-text">Seluruh data event, skor, timer, kelas, bagan, dan log akan dihapus dan kembali ke kondisi awal sistem.</p>
       <div class="modal-actions">
         <button type="button" id="btnResetAllCancel" class="btn btn-ghost">BATAL</button>
         <button type="button" id="btnResetAllConfirm" class="btn btn-danger">RESET</button>
@@ -194,6 +307,7 @@
   <script src="js/juri.js"></script>
   <script src="js/monitor.js"></script>
   <script src="js/sekretaris.js"></script>
+  <script src="js/bracket.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

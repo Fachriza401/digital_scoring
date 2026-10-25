@@ -6,15 +6,18 @@
   var U = null;
 
   var el = {};
+  var timelineFilter = "all";
 
   var SCORE_CONFIG = [
     { label: "BINAAN 1", v: "+1", action: "bonus", type: "binaan1", cls: "sb--gold" },
     { label: "BINAAN 2", v: "+2", action: "bonus", type: "binaan2", cls: "sb--gold" },
     { label: "JATUHAN", v: "+3", action: "bonus", type: "jatuhan", cls: "sb--gold" },
-    { label: "TEGURAN 1", v: "-1", action: "deduct", type: "teguran1", cls: "sb--warning" },
-    { label: "TEGURAN 2", v: "-2", action: "deduct", type: "teguran2", cls: "sb--warning" },
-    { label: "PERINGATAN 1", v: "-5", action: "deduct", type: "peringatan1", cls: "sb--penalty" },
-    { label: "PERINGATAN 2", v: "-10", action: "deduct", type: "peringatan2", cls: "sb--penalty" },
+    { label: "TEGURAN I", v: "-1", action: "deduct", type: "teguran1", cls: "sb--warning" },
+    { label: "TEGURAN II", v: "-2", action: "deduct", type: "teguran2", cls: "sb--warning" },
+    { label: "TEGURAN III", v: "-3", action: "deduct", type: "teguran3", cls: "sb--warning" },
+    { label: "PERINGATAN I", v: "-5", action: "deduct", type: "peringatan1", cls: "sb--penalty" },
+    { label: "PERINGATAN II", v: "-10", action: "deduct", type: "peringatan2", cls: "sb--penalty" },
+    { label: "PERINGATAN III", v: "-15", action: "deduct", type: "peringatan3", cls: "sb--penalty" },
     { label: "DISKUALIFIKASI", v: "DQ", action: "disk", type: "", cls: "sb--danger" }
   ];
 
@@ -28,16 +31,19 @@
     U = global.IPSI.Utils;
     grab([
       "miEventName", "miMatchLine", "miRoundLabel", "miStatus", "miTimer", "miCategory",
-      "btnPlay", "btnPause", "btnResetTimer", "btnSetDuration", "roundChips",
+      "btnPlay", "btnPause", "btnResetTimer", "btnSetDuration", "btnEmergency", "roundChips",
       "timerBar", "blueScore", "redScore", "blueName", "redName",
       "blueContingent", "redContingent", "blueDq", "redDq",
+      "blueClubLogo", "redClubLogo", "blueContingentLogo", "redContingentLogo",
       "blueFalls", "redFalls", "blueWarnings", "redWarnings",
       "bluePenalties", "redPenalties", "blueButtons", "redButtons",
       "judgePanels", "blueLog", "redLog",
       "btnVerifyFall", "btnVerifyPenalty", "pendingFallBadge", "pendingPenaltyBadge",
-      "resetModal", "btnResetCancel", "btnResetConfirm",
+      "resetModal", "resetStep1", "resetStep2", "btnResetCancel", "btnResetContinue",
+      "btnResetBack", "btnResetConfirm", "resetConfirmText",
       "durationModal", "durationForm", "durMin", "durSec", "btnDurationCancel",
-      "btnResetMatchShort", "btnSettingsClose", "settingsModal"
+      "btnResetMatchShort", "btnSettingsClose", "settingsModal",
+      "decisionTimeline", "btnClearTimeline"
     ]);
 
     buildScoreButtons(el.blueButtons, "blue");
@@ -121,6 +127,32 @@
     if (el.btnResetTimer) el.btnResetTimer.addEventListener("click", function () { Timer.reset(); U.toast("TIMER DI-RESET", "info"); });
     if (el.btnSetDuration) el.btnSetDuration.addEventListener("click", openDurationModal);
 
+    if (el.btnEmergency) el.btnEmergency.addEventListener("click", function () {
+      var state = State.getState();
+      if (state.timer.emergency) {
+        Timer.clearEmergency();
+        U.toast("EMERGENCY PAUSE DICABUT - TEKAN PLAY UNTUK LANJUT", "info");
+      } else {
+        Timer.emergencyPause();
+        U.toast("EMERGENCY PAUSE AKTIF - TIMER DIHENTIKAN", "error");
+      }
+    });
+
+    if (el.btnClearTimeline) el.btnClearTimeline.addEventListener("click", function () {
+      State.actions.clearTimeline();
+      U.toast("TIMELINE DIBERSIHKAN", "info");
+    });
+
+    U.qsa("[data-filter]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        timelineFilter = btn.getAttribute("data-filter") || "all";
+        U.qsa("[data-filter]").forEach(function (b) {
+          b.classList.toggle("is-active", b === btn);
+        });
+        renderTimeline(State.getState());
+      });
+    });
+
     if (el.btnVerifyFall) el.btnVerifyFall.addEventListener("click", function () {
       State.actions.verifyFall();
       U.toast("VERIFIKASI JATUHAN DISETUJUI", "success");
@@ -140,8 +172,21 @@
 
     if (el.resetModal) {
       if (el.btnResetCancel) el.btnResetCancel.addEventListener("click", closeResetModal);
+      if (el.btnResetContinue) el.btnResetContinue.addEventListener("click", function () {
+        if (el.resetStep1) el.resetStep1.hidden = true;
+        if (el.resetStep2) el.resetStep2.hidden = false;
+        if (el.resetConfirmText) el.resetConfirmText.focus();
+      });
+      if (el.btnResetBack) el.btnResetBack.addEventListener("click", function () {
+        if (el.resetStep1) el.resetStep1.hidden = false;
+        if (el.resetStep2) el.resetStep2.hidden = true;
+      });
+      if (el.resetConfirmText) el.resetConfirmText.addEventListener("input", function () {
+        if (el.btnResetConfirm) el.btnResetConfirm.disabled = el.resetConfirmText.value.trim().toUpperCase() !== "RESET";
+      });
       if (el.btnResetConfirm) {
         el.btnResetConfirm.addEventListener("click", function () {
+          if (!el.resetConfirmText || el.resetConfirmText.value.trim().toUpperCase() !== "RESET") return;
           State.actions.resetMatch();
           closeResetModal();
           U.toast("PERTANDINGAN DI-RESET", "info");
@@ -166,7 +211,12 @@
   }
 
   function openResetModal() {
-    if (el.resetModal) el.resetModal.hidden = false;
+    if (!el.resetModal) return;
+    el.resetModal.hidden = false;
+    if (el.resetStep1) el.resetStep1.hidden = false;
+    if (el.resetStep2) el.resetStep2.hidden = true;
+    if (el.resetConfirmText) el.resetConfirmText.value = "";
+    if (el.btnResetConfirm) el.btnResetConfirm.disabled = true;
   }
   function closeResetModal() {
     if (el.resetModal) el.resetModal.hidden = true;
@@ -225,7 +275,28 @@
     renderJudges(state);
     renderLogs(state);
     renderPending(state);
+    renderTimeline(state);
+    renderEmergency(state);
     renderTimerDisplay(Timer.getDisplayRemaining(state));
+  }
+
+  function renderEmergency(state) {
+    if (!el.btnEmergency) return;
+    var active = state.timer.emergency === true;
+    el.btnEmergency.textContent = active ? "LANJUTKAN (MEDIS)" : "EMERGENCY PAUSE";
+    el.btnEmergency.classList.toggle("is-emergency", active);
+    el.btnEmergency.setAttribute("aria-pressed", active ? "true" : "false");
+  }
+
+  function setLogo(node, src) {
+    if (!node) return;
+    if (src) {
+      node.src = src;
+      node.classList.add("has-image");
+    } else {
+      node.removeAttribute("src");
+      node.classList.remove("has-image");
+    }
   }
 
   function renderHeader(state) {
@@ -235,8 +306,8 @@
     if (el.miRoundLabel) el.miRoundLabel.textContent = "BABAK " + state.round + " - " + (state.timer.status === "RUNNING" ? "AKTIF" : "SIAGA");
     if (el.miCategory) el.miCategory.textContent = ev.category;
     if (el.miStatus) {
-      el.miStatus.className = "status-pill status-" + global.IPSI.Utils.statusClass(state.timer.status);
-      el.miStatus.textContent = state.timer.status;
+      el.miStatus.className = "status-pill status-" + global.IPSI.Utils.statusClass(state.timer.emergency ? "PAUSED" : state.timer.status);
+      el.miStatus.textContent = state.timer.emergency ? "MEDIS" : state.timer.status;
     }
   }
 
@@ -272,23 +343,34 @@
   function renderTeam(team, teamKey) {
     var panel = document.querySelector(".team-panel--" + teamKey);
     if (panel) panel.classList.toggle("is-disqualified", team.disqualified);
+    var state = State.getState();
     if (teamKey === "blue") {
-      if (el.blueName) el.blueName.textContent = team.name;
+      if (el.blueName) {
+        el.blueName.textContent = team.name;
+        U.fitText(el.blueName, { min: 12, max: 22 });
+      }
       if (el.blueContingent) el.blueContingent.textContent = team.contingent;
       if (el.blueScore) el.blueScore.textContent = team.score;
       if (el.blueDq) el.blueDq.hidden = !team.disqualified;
       if (el.blueFalls) el.blueFalls.textContent = team.falls;
-      if (el.blueWarnings) el.blueWarnings.textContent = Number(team.teguran1 || 0) + Number(team.teguran2 || 0);
-      if (el.bluePenalties) el.bluePenalties.textContent = Number(team.peringatan1 || 0) + Number(team.peringatan2 || 0);
+      if (el.blueWarnings) el.blueWarnings.textContent = Number(team.teguran1 || 0) + Number(team.teguran2 || 0) + Number(team.teguran3 || 0);
+      if (el.bluePenalties) el.bluePenalties.textContent = Number(team.peringatan1 || 0) + Number(team.peringatan2 || 0) + Number(team.peringatan3 || 0);
+      setLogo(el.blueClubLogo, state.event.blueLogo);
+      setLogo(el.blueContingentLogo, state.event.blueContingentLogo);
       setDisabled(el.blueButtons, team.disqualified);
     } else {
-      if (el.redName) el.redName.textContent = team.name;
+      if (el.redName) {
+        el.redName.textContent = team.name;
+        U.fitText(el.redName, { min: 12, max: 22 });
+      }
       if (el.redContingent) el.redContingent.textContent = team.contingent;
       if (el.redScore) el.redScore.textContent = team.score;
       if (el.redDq) el.redDq.hidden = !team.disqualified;
       if (el.redFalls) el.redFalls.textContent = team.falls;
-      if (el.redWarnings) el.redWarnings.textContent = Number(team.teguran1 || 0) + Number(team.teguran2 || 0);
-      if (el.redPenalties) el.redPenalties.textContent = Number(team.peringatan1 || 0) + Number(team.peringatan2 || 0);
+      if (el.redWarnings) el.redWarnings.textContent = Number(team.teguran1 || 0) + Number(team.teguran2 || 0) + Number(team.teguran3 || 0);
+      if (el.redPenalties) el.redPenalties.textContent = Number(team.peringatan1 || 0) + Number(team.peringatan2 || 0) + Number(team.peringatan3 || 0);
+      setLogo(el.redClubLogo, state.event.redLogo);
+      setLogo(el.redContingentLogo, state.event.redContingentLogo);
       setDisabled(el.redButtons, team.disqualified);
     }
   }
@@ -382,6 +464,69 @@
       return String(value);
     }
     return String(value === "" ? 0 : value);
+  }
+
+  function renderTimeline(state) {
+    if (!el.decisionTimeline) return;
+    var all = (state.timeline || []).slice().reverse();
+    var list = all.filter(function (item) {
+      if (timelineFilter === "all") return true;
+      return item.team === timelineFilter;
+    }).slice(0, 120);
+    el.decisionTimeline.innerHTML = "";
+    if (!list.length) {
+      var empty = document.createElement("p");
+      empty.className = "timeline-empty";
+      empty.textContent = "Belum ada keputusan dewan pada pertandingan ini.";
+      el.decisionTimeline.appendChild(empty);
+      return;
+    }
+    list.forEach(function (item) {
+      var row = document.createElement("div");
+      row.className = "timeline-item timeline-item--" + item.team + (item.kind === "emergency" ? " timeline-item--emergency" : "");
+      var marker = document.createElement("span");
+      marker.className = "timeline-marker";
+      marker.textContent = item.team === "blue" ? "B" : item.team === "red" ? "M" : "•";
+      var body = document.createElement("div");
+      body.className = "timeline-body";
+      var line = document.createElement("div");
+      line.className = "timeline-line";
+      var label = document.createElement("strong");
+      label.textContent = item.label;
+      var time = document.createElement("time");
+      time.textContent = formatTime(item.at);
+      line.appendChild(label);
+      line.appendChild(time);
+      body.appendChild(line);
+      if (item.detail) {
+        var detail = document.createElement("span");
+        detail.className = "timeline-detail";
+        detail.textContent = "B" + item.round + " • " + item.detail;
+        body.appendChild(detail);
+      } else {
+        var round = document.createElement("span");
+        round.className = "timeline-detail";
+        round.textContent = "BABAK " + item.round;
+        body.appendChild(round);
+      }
+      if (item.value) {
+        var value = document.createElement("b");
+        value.className = "timeline-value";
+        value.textContent = (item.value > 0 ? "+" : "") + item.value;
+        row.appendChild(marker);
+        row.appendChild(body);
+        row.appendChild(value);
+      } else {
+        row.appendChild(marker);
+        row.appendChild(body);
+      }
+      el.decisionTimeline.appendChild(row);
+    });
+  }
+
+  function formatTime(ts) {
+    var d = new Date(ts || Date.now());
+    return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") + ":" + String(d.getSeconds()).padStart(2, "0");
   }
 
   function renderPending(state) {
