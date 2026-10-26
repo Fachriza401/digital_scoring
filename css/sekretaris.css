@@ -347,6 +347,20 @@
 .page-sekretaris .result-note { background:var(--bg-secondary); }
 .page-sekretaris .history-item { border-left-color:var(--blue); }
 
+.bracket-section {
+  max-width:none;
+  margin-top:1.2rem;
+  padding:1.5rem 0 1rem;
+  border-top:1px solid var(--border);
+}
+.bracket-section .bracket-head h2 {
+  margin-top:0.15rem;
+  font-family:var(--font-num);
+  font-size:clamp(1.4rem,3vw,2.2rem);
+  line-height:1.08;
+  letter-spacing:0.03em;
+}
+
 @media (max-width:520px) {
   .logo-form-row { grid-template-columns:1fr; }
   .field-row--duration { grid-template-columns:1fr 1fr 1fr; gap:0.4rem; }

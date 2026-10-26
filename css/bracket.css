@@ -45,6 +45,49 @@
   flex-wrap: wrap;
 }
 
+.bracket-class-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.8rem 0 0.6rem;
+}
+
+.bracket-class-tab {
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(148,163,184,0.12), rgba(15,23,42,0.9));
+  color: var(--text-secondary);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.bracket-class-tab.is-active {
+  color: var(--text-primary);
+  border-color: rgba(22,131,255,0.9);
+  box-shadow: 0 0 0 1px rgba(22,131,255,0.4), 0 12px 30px -18px rgba(0,217,255,0.8);
+  background: radial-gradient(circle at top, rgba(0,217,255,0.18), transparent 70%), linear-gradient(180deg, rgba(22,131,255,0.25), rgba(10,20,37,0.95));
+}
+
+.bracket-class-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  margin-bottom: 0.9rem;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+.bracket-class-summary span {
+  border: 1px solid var(--border);
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(15,23,42,0.7);
+}
+
 .panel {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -303,6 +346,23 @@
   gap: 0.75rem;
   padding: 0.85rem 1rem;
   border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.bracket-board-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.bracket-board-viewport {
+  overflow: auto;
+}
+
+.bracket-board-viewport .bracket-board {
+  min-width: max-content;
+  transform-origin: top left;
 }
 
 .bracket-status {

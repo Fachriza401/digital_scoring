@@ -20,7 +20,10 @@
       "participantList", "bracketBoard"
     ]);
     bind();
-    render(global.IPSI.State.getState());
+    try { bindZoom(); } catch (e) {}
+    var st = global.IPSI.State.getState();
+    try { if (global.IPSI.State.actions && global.IPSI.State.actions.ensureBracketsState) global.IPSI.State.actions.ensureBracketsState(st); } catch (e) {}
+    render(st);
     global.IPSI.State.subscribe(render);
   }
 
@@ -51,16 +54,20 @@
     bindLogo(el.pLogo, "logo", el.pvParticipantLogo);
     bindLogo(el.pContingentLogo, "contingentLogo", el.pvParticipantContingentLogo);
 
+    bindClassTabs();
+    try { bindZoom(); } catch (e) {}
+
     if (el.btnGenerate) {
       el.btnGenerate.addEventListener("click", function () {
         var state = global.IPSI.State.getState();
-        if (state.bracket.participants.length < 2) {
+        var bracket = (global.IPSI && global.IPSI.Bracket && global.IPSI.Bracket._getActiveBracket) ? global.IPSI.Bracket._getActiveBracket(state) : (state.brackets && state.brackets[state.activeBracketClass]) || state.bracket;
+        if (!bracket || bracket.participants.length < 2) {
           U.toast("MINIMAL 2 PESERTA UNTUK MEMBUAT BAGAN", "error");
           return;
         }
         global.IPSI.State.actions.generateBracket({
-          title: el.bracketTitleInput.value.trim() || "BAGAN PERTANDINGAN",
-          category: el.bracketCategoryInput.value.trim()
+          title: el.bracketTitleInput.value.trim() || ("BAGAN PERTANDINGAN - KELAS " + (state.activeBracketClass||"A")),
+          category: el.bracketCategoryInput.value.trim() || ("KELAS " + (state.activeBracketClass||"A"))
         });
         U.toast("BAGAN DIPERBARUI");
       });
@@ -69,7 +76,8 @@
     if (el.btnShuffle) {
       el.btnShuffle.addEventListener("click", function () {
         var state = global.IPSI.State.getState();
-        if (state.bracket.participants.length < 2) {
+        var bracket = (state.brackets && state.brackets[state.activeBracketClass]) || state.bracket;
+        if (!bracket || bracket.participants.length < 2) {
           U.toast("MINIMAL 2 PESERTA UNTUK MENGACAK", "error");
           return;
         }
@@ -104,13 +112,26 @@
         if (!btn) return;
         var matchId = btn.getAttribute("data-load-match");
         var state = global.IPSI.State.getState();
-        var found = global.IPSI.State.findBracketMatch(state.bracket, matchId);
+        if (global.IPSI && global.IPSI.State && global.IPSI.State.actions && global.IPSI.State.actions.ensureBracketsState) {
+          try { global.IPSI.State.actions.ensureBracketsState(state); } catch (e) {}
+        }
+        var cls = state.activeBracketClass || "A";
+        var bracketCur = (state.brackets && state.brackets[cls]) || state.bracket;
+        var found = global.IPSI.State.findBracketMatch(bracketCur, matchId);
         if (!found || !found.match.blueId || !found.match.redId) {
           U.toast("PARTAI BELUM LENGKAP", "error");
           return;
         }
+        if (global.IPSI && global.IPSI.State && global.IPSI.State.actions && global.IPSI.State.actions.setActiveBracketClass) {
+          global.IPSI.State.actions.setActiveBracketClass(cls);
+        }
         global.IPSI.State.actions.loadBracketMatch(matchId);
-        global.location.href = "sekretaris.html";
+        if (document.body.dataset.mode === "sekretaris") {
+          var arena = document.getElementById("arena");
+          if (arena) arena.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+          global.location.href = "sekretaris.html#arena";
+        }
       });
     }
   }
@@ -167,6 +188,7 @@
     if (el.bracketCategoryInput && document.activeElement !== el.bracketCategoryInput) {
       el.bracketCategoryInput.value = bracket.category || "";
     }
+    try { bindZoom(); } catch (e) {}
     renderParticipants(bracket);
     renderBoard(state, bracket);
   }
@@ -174,7 +196,7 @@
   function renderParticipants(bracket) {
     if (!el.participantList) return;
     el.participantList.innerHTML = "";
-    if (!bracket.participants.length) {
+    if (!bracket.participants || !bracket.participants.length) {
       var empty = document.createElement("p");
       empty.className = "participant-empty";
       empty.textContent = "Belum ada peserta. Tambahkan minimal 2 atlet untuk membuat bagan.";
@@ -225,10 +247,10 @@
     var stale = isStale(bracket);
     updateStatus(state, bracket, stale);
 
-    if (!bracket.rounds.length) {
+    if (!bracket.rounds || !bracket.rounds.length) {
       var empty = document.createElement("div");
       empty.className = "bracket-empty";
-      empty.innerHTML = "<strong>BAGAN BELUM DIBUAT</strong><span>Tambahkan peserta lalu tekan BUAT / PERBARUI BAGAN.</span>";
+      empty.innerHTML = "<strong>BAGAN BELUM DIBUAT</strong><span>Tambahkan minimal 2 peserta lalu klik BUAT / PERBARUI BAGAN.</span>";
       el.bracketBoard.appendChild(empty);
       return;
     }
@@ -277,14 +299,16 @@
   }
 
   function isStale(bracket) {
-    if (!bracket.rounds.length) return false;
+    if (!bracket || !bracket.rounds || !bracket.rounds.length) return false;
+    if (!bracket.rounds[0] || !bracket.rounds[0].matches) return false;
     var ids = {};
     var count = 0;
     bracket.rounds[0].matches.forEach(function (m) {
       if (m.blueId) { ids[m.blueId] = true; count++; }
       if (m.redId) { ids[m.redId] = true; count++; }
     });
-    if (count !== bracket.participants.length) return true;
+    if (bracket.participants && count !== bracket.participants.length) return true;
+    if (!bracket.participants) return false;
     return bracket.participants.some(function (p) { return !ids[p.id]; });
   }
 
@@ -404,5 +428,5 @@
   }
 
   global.IPSI = global.IPSI || {};
-  global.IPSI.Bracket = { init: init };
+  global.IPSI.Bracket = { init: init, _getActiveBracket: getActiveBracket, bindClassTabs: bindClassTabs, render: render };
 })(window);

@@ -7,6 +7,7 @@
 <title>Sekretaris — IPSI Scoring Live Digital</title>
 <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
 <link rel="stylesheet" href="css/global.css">
+<link rel="stylesheet" href="css/bracket.css">
 <link rel="stylesheet" href="css/sekretaris.css">
 </head>
 <body class="page-sekretaris" data-mode="sekretaris">
@@ -20,7 +21,7 @@
       <span class="navbar-badge">Active: Sekretaris View</span>
     </div>
     <div class="navbar-right">
-      <a class="navbar-back" href="bracket.html">BAGAN PERTANDINGAN</a>
+      <a class="navbar-back" href="#bagan">BAGAN &amp; PESERTA</a>
       <button type="button" class="btn-fs" data-action="fullscreen">FULLSCREEN</button>
       <span class="navbar-unlock">SYSTEM UNLOCKED</span>
     </div>
@@ -41,7 +42,7 @@
     </header>
 
     <section class="sekretaris-grid">
-      <article class="panel panel--form">
+      <article id="arena" class="panel panel--form">
         <h2 class="section-heading">DATA PERTANDINGAN</h2>
 
         <div class="field">
@@ -195,7 +196,7 @@
           <button type="button" id="btnAddClass" class="btn btn-primary btn-block">TAMBAH KELAS</button>
         </div>
         <div id="classList" class="class-list" aria-live="polite"></div>
-        <a class="btn btn-ghost btn-block" href="bracket.html">KELOLA BAGAN &amp; PESERTA</a>
+        <a class="btn btn-ghost btn-block" href="#bagan">KELOLA BAGAN &amp; PESERTA</a>
       </article>
 
       <article class="panel panel--control">
@@ -259,6 +260,108 @@
         <h2 class="section-heading">HISTORI REKOR LAGA SELESAI</h2>
         <div id="matchHistory" class="history-list" aria-live="polite"></div>
       </article>
+    </section>
+
+    <section id="bagan" class="bracket-main bracket-section" aria-labelledby="bracketTitle">
+      <header class="bracket-head">
+        <div>
+          <span class="mini-label">SISTEM GUGUR / SINGLE ELIMINATION</span>
+          <h2 id="bracketTitle">BAGAN PERTANDINGAN</h2>
+          <p id="bracketSubtitle" class="bracket-subtitle">Kelola peserta, susun bagan, dan muat partai ke arena pertandingan.</p>
+        </div>
+        <div class="bracket-head-actions">
+          <span id="bracketCount" class="status-pill status-ready">0 PESERTA</span>
+          <a class="btn btn-gold" href="#arena">KE ARENA</a>
+        </div>
+      </header>
+
+      <nav class="bracket-class-tabs" id="bracketClassTabs" aria-label="Pilih kelas pertandingan">
+        <button type="button" class="bracket-class-tab is-active" data-bracket-class="A">KELAS A</button>
+        <button type="button" class="bracket-class-tab" data-bracket-class="B">KELAS B</button>
+        <button type="button" class="bracket-class-tab" data-bracket-class="C">KELAS C</button>
+        <button type="button" class="bracket-class-tab" data-bracket-class="D">KELAS D</button>
+        <button type="button" class="bracket-class-tab" data-bracket-class="E">KELAS E</button>
+        <button type="button" class="bracket-class-tab" data-bracket-class="F">KELAS F</button>
+        <button type="button" class="bracket-class-tab" data-bracket-class="G">KELAS G</button>
+      </nav>
+      <div class="bracket-class-summary">
+        <span id="bracketClassInfo">KELAS A</span>
+        <span id="bracketMatchCount">0 PERTANDINGAN</span>
+        <span id="bracketRoundInfo">-</span>
+        <span id="bracketChampionInfo">JUARA: -</span>
+      </div>
+
+      <section class="panel bracket-config">
+        <div class="bracket-config-fields">
+          <div class="field">
+            <label for="bracketTitleInput">NAMA BAGAN</label>
+            <input type="text" id="bracketTitleInput" class="input" maxlength="80" placeholder="cth: TANDING PUTRA - KELAS A">
+          </div>
+          <div class="field">
+            <label for="bracketCategoryInput">KELAS / KATEGORI</label>
+            <input type="text" id="bracketCategoryInput" class="input" maxlength="80" placeholder="cth: TANDING PUTRA - KELAS A">
+          </div>
+        </div>
+        <div class="bracket-config-actions">
+          <button type="button" id="btnGenerate" class="btn btn-primary">BUAT / PERBARUI BAGAN</button>
+          <button type="button" id="btnShuffle" class="btn btn-ghost">ACAK URUTAN</button>
+          <button type="button" id="btnResetBracket" class="btn btn-danger">RESET BAGAN</button>
+        </div>
+      </section>
+
+      <div class="bracket-layout">
+        <aside class="panel participant-panel">
+          <h3 class="section-heading">PESERTA</h3>
+          <form id="participantForm" class="participant-form" autocomplete="off">
+            <div class="field">
+              <label for="pName">NAMA ATLET</label>
+              <input type="text" id="pName" class="input" maxlength="80" required placeholder="Nama pesilat">
+            </div>
+            <div class="field">
+              <label for="pContingent">KONTINGEN / DAERAH</label>
+              <input type="text" id="pContingent" class="input" maxlength="80" placeholder="Nama kontingen">
+            </div>
+            <div class="logo-form-row">
+              <div class="logo-picker">
+                <span class="mini-label">LOGO PERGURUAN</span>
+                <div class="logo-picker-body">
+                  <img id="pvParticipantLogo" class="logo-preview" alt="Pratinjau logo perguruan">
+                  <label class="btn btn-ghost btn-sm file-label" for="pLogo">PILIH
+                    <input type="file" id="pLogo" accept="image/*" hidden>
+                  </label>
+                </div>
+              </div>
+              <div class="logo-picker">
+                <span class="mini-label">LOGO KONTINGEN</span>
+                <div class="logo-picker-body">
+                  <img id="pvParticipantContingentLogo" class="logo-preview" alt="Pratinjau logo kontingen">
+                  <label class="btn btn-ghost btn-sm file-label" for="pContingentLogo">PILIH
+                    <input type="file" id="pContingentLogo" accept="image/*" hidden>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">TAMBAH PESERTA</button>
+          </form>
+          <div id="participantList" class="participant-list" aria-live="polite"></div>
+        </aside>
+
+        <section class="bracket-board-panel" aria-labelledby="bracketBoardHeading">
+          <div class="bracket-board-head">
+            <h3 id="bracketBoardHeading" class="section-heading">VISUALISASI BAGAN</h3>
+            <div class="bracket-board-tools">
+              <button type="button" class="btn btn-ghost btn-sm" id="btnBracketZoomOut">-</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="btnBracketZoomIn">+</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="btnBracketZoomReset">RESET</button>
+              <button type="button" class="btn btn-ghost btn-sm" id="btnBracketFit">FIT</button>
+              <span id="bracketStatus" class="bracket-status">BELUM ADA BAGAN</span>
+            </div>
+          </div>
+          <div class="bracket-board-viewport" id="bracketBoardViewport">
+            <div id="bracketBoard" class="bracket-board" aria-live="polite"></div>
+          </div>
+        </section>
+      </div>
     </section>
   </main>
 

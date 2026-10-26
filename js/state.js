@@ -39,7 +39,18 @@
       history: [],
       classes: [],
       activeClassId: null,
-      bracket: emptyBracket()
+      activeBracketClass: "A",
+      bracket: emptyBracket(),
+      brackets: (function () {
+        var b = {};
+        ["A", "B", "C", "D", "E", "F", "G"].forEach(function (cls) {
+          var eb = emptyBracket();
+          eb.title = "BAGAN PERTANDINGAN - KELAS " + cls;
+          eb.category = "KELAS " + cls;
+          b[cls] = eb;
+        });
+        return b;
+      })()
     };
   }
 
@@ -52,6 +63,34 @@
       activeMatchId: null,
       updatedAt: null
     };
+  }
+
+  function ensureBracketsState(state) {
+    if (!state) return state;
+    if (!state.brackets || typeof state.brackets !== "object") {
+      state.brackets = {};
+    }
+    var classes = ["A", "B", "C", "D", "E", "F", "G"];
+    classes.forEach(function (cls) {
+      if (!state.brackets[cls] || typeof state.brackets[cls] !== "object") {
+        state.brackets[cls] = emptyBracket();
+        state.brackets[cls].title = "BAGAN PERTANDINGAN - KELAS " + cls;
+        state.brackets[cls].category = "KELAS " + cls;
+      }
+    });
+    if (!state.activeBracketClass) {
+      state.activeBracketClass = "A";
+    }
+    if (classes.indexOf(state.activeBracketClass) === -1) {
+      state.activeBracketClass = "A";
+    }
+    // backward compatibility
+    if ((!state.brackets[state.activeBracketClass] || !state.brackets[state.activeBracketClass].rounds || !state.brackets[state.activeBracketClass].rounds.length) && state.bracket) {
+      try {
+        state.brackets[state.activeBracketClass] = sanitizeBracket(state.bracket, sanitizeParticipants(state.bracket.participants));
+      } catch (e) {}
+    }
+    return state;
   }
 
   function makeTeam(name, contingent) {
@@ -384,7 +423,37 @@
       history: sanitizeHistory(r.history),
       classes: sanitizeClasses(r.classes),
       activeClassId: sanitizeId(r.activeClassId),
-      bracket: sanitizeBracket(r.bracket, participants)
+      activeBracketClass: (function () {
+        var c = sanitizeId(r.activeBracketClass);
+        if (["A","B","C","D","E","F","G"].indexOf(c) !== -1) return c;
+        return "A";
+      })(),
+      bracket: sanitizeBracket(r.bracket, participants),
+      brackets: (function () {
+        var out = {};
+        var srcBr = r.brackets && typeof r.brackets === "object" ? r.brackets : {};
+        ["A","B","C","D","E","F","G"].forEach(function (cls) {
+          if (srcBr[cls]) {
+            out[cls] = sanitizeBracket(srcBr[cls], sanitizeParticipants(srcBr[cls].participants));
+          } else {
+            var eb = emptyBracket();
+            eb.title = "BAGAN PERTANDINGAN - KELAS " + cls;
+            eb.category = "KELAS " + cls;
+            out[cls] = eb;
+          }
+        });
+        // migrate old single bracket to active class if new brackets empty
+        var hasAny = false;
+        ["A","B","C","D","E","F","G"].forEach(function (cls) { if (out[cls] && out[cls].rounds && out[cls].rounds.length) hasAny = true; });
+        if (!hasAny && r.bracket) {
+          var cur = (function () {
+            var c = sanitizeId(r.activeBracketClass);
+            return ["A","B","C","D","E","F","G"].indexOf(c) !== -1 ? c : "A";
+          })();
+          out[cur] = sanitizeBracket(r.bracket, participants);
+        }
+        return out;
+      })()
     };
 
     if (state.round > state.event.rounds) state.round = state.event.rounds;
@@ -405,6 +474,7 @@
     if (state.activeClassId && !state.classes.some(function (c) { return c.id === state.activeClassId; })) {
       state.activeClassId = "";
     }
+    try { ensureBracketsState(state); } catch (e) {}
 
     return state;
   }
@@ -555,6 +625,7 @@
 
   function getState() {
     if (!gameState) loadState();
+    try { ensureBracketsState(gameState); } catch (e) {}
     return gameState;
   }
 
@@ -564,11 +635,13 @@
         var raw = global.localStorage.getItem(STORAGE_KEY);
         if (raw) {
           gameState = recomputeScores(sanitizeState(JSON.parse(raw), false));
+          try { ensureBracketsState(gameState); } catch (e) {}
           return;
         }
       } catch (e) {}
     }
     gameState = defaultState();
+    try { ensureBracketsState(gameState); } catch (e) {}
   }
 
   function saveState() {
@@ -1012,6 +1085,9 @@
   function finishMatch(winner) {
     if (["blue", "red", "draw"].indexOf(winner) === -1) return;
     updateState(function (s) {
+      ensureBracketsState(s);
+      var cls = s.activeBracketClass || "A";
+      if (s.brackets && s.brackets[cls]) s.bracket = s.brackets[cls];
       s.timer.running = false;
       s.timer.startedAt = null;
       s.timer.status = "FINISHED";
@@ -1073,7 +1149,10 @@
     var name = sanitizeText(payload && payload.name, "");
     if (!name) return false;
     updateState(function (s) {
-      s.bracket = s.bracket || emptyBracket();
+      ensureBracketsState(s);
+      var cls = s.activeBracketClass || "A";
+      s.brackets[cls] = s.brackets[cls] || emptyBracket();
+      s.bracket = s.brackets[cls];
       s.bracket.participants.push({
         id: newId("p"),
         name: name,
@@ -1090,6 +1169,10 @@
 
   function removeParticipant(id) {
     updateState(function (s) {
+      ensureBracketsState(s);
+      var cls = s.activeBracketClass || "A";
+      s.brackets[cls] = s.brackets[cls] || emptyBracket();
+      s.bracket = s.brackets[cls];
       if (!s.bracket) return;
       s.bracket.participants = s.bracket.participants.filter(function (p) { return p.id !== id; });
       s.bracket.participants.forEach(function (p, i) { p.seed = i + 1; });
@@ -1101,6 +1184,10 @@
 
   function updateParticipant(id, payload) {
     updateState(function (s) {
+      ensureBracketsState(s);
+      var cls = s.activeBracketClass || "A";
+      s.brackets[cls] = s.brackets[cls] || emptyBracket();
+      s.bracket = s.brackets[cls];
       if (!s.bracket) return;
       var p = participantById(s.bracket, id);
       if (!p) return;
@@ -1129,6 +1216,10 @@
 
   function shuffleParticipants() {
     updateState(function (s) {
+      ensureBracketsState(s);
+      var cls = s.activeBracketClass || "A";
+      s.brackets[cls] = s.brackets[cls] || emptyBracket();
+      s.bracket = s.brackets[cls];
       if (!s.bracket) return;
       var list = s.bracket.participants.slice();
       for (var i = list.length - 1; i > 0; i--) {
@@ -1143,17 +1234,28 @@
       s.bracket.activeMatchId = "";
       s.bracket.updatedAt = Date.now();
       recomputeBracket(s.bracket);
+      s.brackets[cls] = s.bracket;
     });
   }
 
   function resetBracket() {
     updateState(function (s) {
-      s.bracket = emptyBracket();
+      ensureBracketsState(s);
+      var cls = s.activeBracketClass || "A";
+      var eb = emptyBracket();
+      eb.title = "BAGAN PERTANDINGAN - KELAS " + cls;
+      eb.category = "KELAS " + cls;
+      s.brackets[cls] = eb;
+      s.bracket = eb;
     });
   }
 
   function loadBracketMatch(matchId) {
     updateState(function (s) {
+      ensureBracketsState(s);
+      var cls = s.activeBracketClass || "A";
+      s.brackets[cls] = s.brackets[cls] || emptyBracket();
+      s.bracket = s.brackets[cls];
       var found = findBracketMatch(s.bracket, matchId);
       if (!found) return;
       var m = found.match;
@@ -1198,9 +1300,12 @@
 
   function clearActiveBracketMatch() {
     updateState(function (s) {
+      ensureBracketsState(s);
+      var cls = s.activeBracketClass || "A";
+      s.brackets[cls] = s.brackets[cls] || emptyBracket();
+      s.bracket = s.brackets[cls];
       if (s.bracket) {
         s.bracket.activeMatchId = "";
-        s.bracket.updatedAt = Date.now();
       }
     });
   }
@@ -1340,6 +1445,19 @@
     findBracketMatch: findBracketMatch,
     participantById: participantById,
     actions: {
+      ensureBracketsState: ensureBracketsState,
+      setActiveBracketClass: function (cls) {
+        updateState(function (s) {
+          ensureBracketsState(s);
+          if (["A","B","C","D","E","F","G"].indexOf(cls) !== -1) {
+            s.activeBracketClass = cls;
+            s.brackets[cls] = s.brackets[cls] || emptyBracket();
+            if (!s.brackets[cls].title) s.brackets[cls].title = "BAGAN PERTANDINGAN - KELAS " + cls;
+            if (!s.brackets[cls].category) s.brackets[cls].category = "KELAS " + cls;
+            s.bracket = s.brackets[cls];
+          }
+        }, { source: "sekretaris" });
+      },
       addPunch: addPunch,
       addKick: addKick,
       applyBonus: applyBonus,

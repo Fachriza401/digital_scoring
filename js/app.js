@@ -125,7 +125,10 @@
     if (mode === "dewan" && global.IPSI.Dewan) global.IPSI.Dewan.init();
     else if (mode === "juri" && global.IPSI.Juri) global.IPSI.Juri.init();
     else if (mode === "monitor" && global.IPSI.Monitor) global.IPSI.Monitor.init();
-    else if (mode === "sekretaris" && global.IPSI.Sekretaris) global.IPSI.Sekretaris.init();
+    else if (mode === "sekretaris") {
+      if (global.IPSI.Sekretaris) global.IPSI.Sekretaris.init();
+      if (global.IPSI.Bracket) global.IPSI.Bracket.init();
+    }
     else if (mode === "bracket" && global.IPSI.Bracket) global.IPSI.Bracket.init();
   }
 
