@@ -45,7 +45,7 @@
     if (form) form.addEventListener("submit", function (event) {
       event.preventDefault();
       if (!selectedJudge || !input) return;
-      if (input.value !== passwords[selectedJudge]) {
+      if (input.value.trim().toUpperCase() !== String(passwords[selectedJudge]).trim().toUpperCase()) {
         if (error) error.textContent = "PASSWORD SALAH. SILAKAN COBA LAGI.";
         input.select();
         return;

@@ -3,7 +3,6 @@
 
   var U = null;
   var el = {};
-  var draft = { logo: "", contingentLogo: "" };
 
   function grab(ids) {
     ids.forEach(function (id) { el[id] = document.getElementById(id); });
@@ -15,9 +14,8 @@
       "bracketTitle", "bracketSubtitle", "bracketCount", "bracketStatus",
       "bracketTitleInput", "bracketCategoryInput",
       "btnGenerate", "btnShuffle", "btnResetBracket",
-      "participantForm", "pName", "pContingent", "pLogo", "pContingentLogo",
-      "pvParticipantLogo", "pvParticipantContingentLogo",
-      "participantList", "bracketBoard"
+      "participantForm", "pName", "pContingent", "participantList", "bracketBoard",
+      "bracketClassInfo", "bracketMatchCount", "bracketRoundInfo", "bracketChampionInfo"
     ]);
     bind();
     try { bindZoom(); } catch (e) {}
@@ -37,22 +35,21 @@
           el.pName.focus();
           return;
         }
-        global.IPSI.State.actions.addParticipant({
+        var added = global.IPSI.State.actions.addParticipant({
           name: name,
-          contingent: el.pContingent.value.trim(),
-          logo: draft.logo,
-          contingentLogo: draft.contingentLogo
+          contingent: el.pContingent.value.trim()
         });
+        if (!added) {
+          U.toast("NAMA ATLET WAJIB DIISI", "error");
+          el.pName.focus();
+          return;
+        }
         el.pName.value = "";
         el.pContingent.value = "";
-        resetDraft();
         el.pName.focus();
         U.toast("PESERTA DITAMBAHKAN");
       });
     }
-
-    bindLogo(el.pLogo, "logo", el.pvParticipantLogo);
-    bindLogo(el.pContingentLogo, "contingentLogo", el.pvParticipantContingentLogo);
 
     bindClassTabs();
     try { bindZoom(); } catch (e) {}
@@ -60,7 +57,7 @@
     if (el.btnGenerate) {
       el.btnGenerate.addEventListener("click", function () {
         var state = global.IPSI.State.getState();
-        var bracket = (global.IPSI && global.IPSI.Bracket && global.IPSI.Bracket._getActiveBracket) ? global.IPSI.Bracket._getActiveBracket(state) : (state.brackets && state.brackets[state.activeBracketClass]) || state.bracket;
+        var bracket = getActiveBracket(state);
         if (!bracket || bracket.participants.length < 2) {
           U.toast("MINIMAL 2 PESERTA UNTUK MEMBUAT BAGAN", "error");
           return;
@@ -76,7 +73,7 @@
     if (el.btnShuffle) {
       el.btnShuffle.addEventListener("click", function () {
         var state = global.IPSI.State.getState();
-        var bracket = (state.brackets && state.brackets[state.activeBracketClass]) || state.bracket;
+        var bracket = getActiveBracket(state);
         if (!bracket || bracket.participants.length < 2) {
           U.toast("MINIMAL 2 PESERTA UNTUK MENGACAK", "error");
           return;
@@ -136,42 +133,15 @@
     }
   }
 
-  function bindLogo(input, key, preview) {
-    if (!input) return;
-    input.addEventListener("change", function () {
-      var file = input.files && input.files[0];
-      if (!file) return;
-      U.readImageFile(file, 256).then(function (dataUrl) {
-        draft[key] = dataUrl;
-        setPreview(preview, dataUrl);
-      }).catch(function (error) {
-        U.toast(error.message || "GAGAL MEMUAT GAMBAR", "error");
-      });
-      input.value = "";
-    });
-  }
-
-  function resetDraft() {
-    draft.logo = "";
-    draft.contingentLogo = "";
-    setPreview(el.pvParticipantLogo, "");
-    setPreview(el.pvParticipantContingentLogo, "");
-  }
-
-  function setPreview(node, src) {
-    if (!node) return;
-    if (src) {
-      node.src = src;
-      node.classList.add("has-image");
-    } else {
-      node.removeAttribute("src");
-      node.classList.remove("has-image");
-    }
-  }
-
   function render(state) {
-    if (!state || !state.bracket) return;
-    var bracket = state.bracket;
+    if (!state) return;
+    var bracket = getActiveBracket(state);
+    if (!bracket) return;
+    var activeClass = state.activeBracketClass || "A";
+    Array.prototype.forEach.call(document.querySelectorAll("[data-bracket-class]"), function (tab) {
+      tab.classList.toggle("is-active", tab.getAttribute("data-bracket-class") === activeClass);
+    });
+    if (el.bracketClassInfo) el.bracketClassInfo.textContent = "KELAS " + activeClass;
     if (el.bracketTitle) el.bracketTitle.textContent = bracket.title || "BAGAN PERTANDINGAN";
     if (el.bracketSubtitle) {
       el.bracketSubtitle.textContent = bracket.category
@@ -188,9 +158,28 @@
     if (el.bracketCategoryInput && document.activeElement !== el.bracketCategoryInput) {
       el.bracketCategoryInput.value = bracket.category || "";
     }
+    renderBracketSummary(bracket);
     try { bindZoom(); } catch (e) {}
     renderParticipants(bracket);
     renderBoard(state, bracket);
+  }
+
+  function renderBracketSummary(bracket) {
+    var matches = 0;
+    var champion = "";
+    (bracket.rounds || []).forEach(function (round) {
+      matches += (round.matches || []).length;
+    });
+    var finalRound = (bracket.rounds || [])[bracket.rounds.length - 1];
+    if (finalRound && finalRound.matches && finalRound.matches[0] && finalRound.matches[0].winnerId) {
+      var winner = global.IPSI.State.participantById(bracket, finalRound.matches[0].winnerId);
+      champion = winner ? winner.name : "";
+    }
+    if (el.bracketMatchCount) el.bracketMatchCount.textContent = matches + " PERTANDINGAN";
+    if (el.bracketRoundInfo) el.bracketRoundInfo.textContent = bracket.rounds.length
+      ? bracket.rounds.length + " BABAK"
+      : "-";
+    if (el.bracketChampionInfo) el.bracketChampionInfo.textContent = "JUARA: " + (champion || "-");
   }
 
   function renderParticipants(bracket) {
@@ -209,16 +198,9 @@
       var seed = document.createElement("span");
       seed.className = "participant-seed";
       seed.textContent = String(index + 1).padStart(2, "0");
-      var logo = document.createElement("div");
-      logo.className = "participant-logo";
-      if (p.logo) {
-        var img = document.createElement("img");
-        img.src = p.logo;
-        img.alt = "Logo " + p.name;
-        logo.appendChild(img);
-      } else {
-        logo.textContent = initial(p.name);
-      }
+      var marker = document.createElement("span");
+      marker.className = "participant-logo";
+      marker.textContent = initial(p.name);
       var info = document.createElement("div");
       info.className = "participant-info";
       var name = document.createElement("strong");
@@ -234,7 +216,7 @@
       remove.setAttribute("aria-label", "Hapus " + p.name);
       remove.textContent = "×";
       row.appendChild(seed);
-      row.appendChild(logo);
+      row.appendChild(marker);
       row.appendChild(info);
       row.appendChild(remove);
       el.participantList.appendChild(row);
@@ -379,16 +361,9 @@
     if (winnerId === id) slot.classList.add("is-winner");
     if (matchStatus === "bye" && winnerId === id) slot.classList.add("is-bye");
 
-    var logo = document.createElement("span");
-    logo.className = "bracket-slot-logo";
-    if (participant && participant.logo) {
-      var img = document.createElement("img");
-      img.src = participant.logo;
-      img.alt = "";
-      logo.appendChild(img);
-    } else {
-      logo.textContent = initial(participant ? participant.name : "?");
-    }
+    var marker = document.createElement("span");
+    marker.className = "bracket-slot-logo";
+    marker.textContent = initial(participant ? participant.name : "?");
 
     var info = document.createElement("span");
     info.className = "bracket-slot-info";
@@ -403,7 +378,7 @@
     var value = document.createElement("b");
     value.className = "bracket-slot-score";
     value.textContent = matchStatus === "done" || matchStatus === "live" ? fmtScore(score) : "";
-    slot.appendChild(logo);
+    slot.appendChild(marker);
     slot.appendChild(info);
     slot.appendChild(value);
     return slot;
@@ -426,6 +401,29 @@
   function initial(name) {
     return String(name || "?").trim().charAt(0).toUpperCase() || "?";
   }
+
+function getActiveBracket(state) {
+  if (!state) state = global.IPSI.State.getState();
+  var cls = (state && state.activeBracketClass) || "A";
+  if (state && state.brackets && state.brackets[cls]) return state.brackets[cls];
+  if (state && state.bracket) return state.bracket;
+  return null;
+}
+
+function bindClassTabs() {
+  var tabs = document.querySelectorAll("[data-bracket-class]");
+  Array.prototype.forEach.call(tabs, function (tab) {
+    tab.addEventListener("click", function () {
+      var cls = tab.getAttribute("data-bracket-class");
+      if (global.IPSI.State.actions && global.IPSI.State.actions.setActiveBracketClass) {
+        global.IPSI.State.actions.setActiveBracketClass(cls);
+      }
+      Array.prototype.forEach.call(tabs, function (t) {
+        t.classList.toggle("is-active", t === tab);
+      });
+    });
+  });
+}
 
   global.IPSI = global.IPSI || {};
   global.IPSI.Bracket = { init: init, _getActiveBracket: getActiveBracket, bindClassTabs: bindClassTabs, render: render };

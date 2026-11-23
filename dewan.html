@@ -64,19 +64,12 @@
       <aside class="team-slot team-slot--blue">
         <article class="team-panel team-panel--blue">
           <header class="team-head">
-            <div class="team-logo team-logo--club" title="Logo perguruan biru">
-              <img id="blueClubLogo" alt="Logo perguruan sudut biru">
-              <span>LOGO</span>
-            </div>
             <div class="team-ident">
               <span class="mini-label">SUDUT BIRU</span>
               <h2 id="blueName" class="team-name">PESILAT BIRU</h2>
               <span id="blueContingent" class="team-contingent">KONTINGEN BIRU</span>
             </div>
-            <div class="team-logo team-logo--contingent" title="Logo kontingen biru">
-              <img id="blueContingentLogo" alt="Logo kontingen sudut biru">
-              <span>DAERAH</span>
-            </div>
+
             <span id="blueDq" class="dq-badge" hidden>DISK</span>
           </header>
           <div id="blueScore" class="team-score team-score--blue" role="status" aria-live="polite">0</div>
@@ -86,11 +79,6 @@
             <span>PERINGATAN <strong id="bluePenalties">0</strong></span>
           </div>
           <div id="blueButtons" class="score-grid"></div>
-        </article>
-
-        <article class="log-panel">
-          <h3 class="log-title">LOG NILAI MASUK (BIRU)</h3>
-          <div id="blueLog" class="log-list" aria-live="polite"></div>
         </article>
       </aside>
 
@@ -116,19 +104,12 @@
       <aside class="team-slot team-slot--red">
         <article class="team-panel team-panel--red">
           <header class="team-head">
-            <div class="team-logo team-logo--club" title="Logo perguruan merah">
-              <img id="redClubLogo" alt="Logo perguruan sudut merah">
-              <span>LOGO</span>
-            </div>
             <div class="team-ident">
               <span class="mini-label">SUDUT MERAH</span>
               <h2 id="redName" class="team-name">PESILAT MERAH</h2>
               <span id="redContingent" class="team-contingent">KONTINGEN MERAH</span>
             </div>
-            <div class="team-logo team-logo--contingent" title="Logo kontingen merah">
-              <img id="redContingentLogo" alt="Logo kontingen sudut merah">
-              <span>DAERAH</span>
-            </div>
+
             <span id="redDq" class="dq-badge" hidden>DISK</span>
           </header>
           <div id="redScore" class="team-score team-score--red" role="status" aria-live="polite">0</div>
@@ -139,12 +120,26 @@
           </div>
           <div id="redButtons" class="score-grid"></div>
         </article>
-
-        <article class="log-panel">
-          <h3 class="log-title">LOG NILAI MASUK (MERAH)</h3>
-          <div id="redLog" class="log-list" aria-live="polite"></div>
-        </article>
       </aside>
+    </section>
+
+    <section class="panel score-log-panel" aria-labelledby="scoreLogTitle">
+      <h2 id="scoreLogTitle" class="section-heading">LOG NILAI MASUK</h2>
+      <div class="score-log-table-wrap" role="region" aria-label="Riwayat nilai masuk" tabindex="0">
+        <table class="score-log-table">
+          <thead>
+            <tr>
+              <th scope="col">WAKTU</th>
+              <th scope="col">JURI / SUMBER</th>
+              <th scope="col">SUDUT</th>
+              <th scope="col">JENIS NILAI</th>
+              <th scope="col">POIN</th>
+              <th scope="col">BABAK</th>
+            </tr>
+          </thead>
+          <tbody id="incomingScoreLog" aria-live="polite"></tbody>
+        </table>
+      </div>
     </section>
 
     <section class="panel timeline-panel" aria-label="Timeline keputusan dewan">
@@ -221,6 +216,7 @@
 
   <script src="js/state.js"></script>
   <script src="js/timer.js"></script>
+  <script src="js/icons.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/sync.js"></script>

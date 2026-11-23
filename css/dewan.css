@@ -175,8 +175,7 @@
   .page-dewan .judge-panels { gap:0.45rem; }
   .page-dewan .judge-card { padding:0.55rem 0.65rem; border-radius:10px; }
   .page-dewan .judge-cell { font-size:0.68rem; padding:0.3rem 0.4rem; }
-  .page-dewan .log-panel { min-height:90px; max-height:170px; padding:0.65rem 0.8rem; }
-  .page-dewan .log-title { font-size:0.6rem; }
+  .page-dewan .score-log-panel { padding:0.8rem; }
   #timerBar { padding:0; margin:0; border:0; background:linear-gradient(90deg,var(--purple),var(--blue)); }
 }
 
@@ -430,61 +429,41 @@
 }
 .verify-badge.is-zero { background:var(--bg-secondary); color:var(--text-muted); border-color:var(--border); }
 
-/* ---- log ---- */
-.log-panel {
-  padding:0.9rem 1rem;
+.score-log-panel { margin-top:0.8rem; }
+.score-log-table-wrap {
+  max-width:100%;
+  overflow:auto;
   border:1px solid var(--border);
-  border-radius:var(--radius-lg);
-  background:var(--bg-secondary);
-  display:flex;
-  flex-direction:column;
-  min-height:150px;
-  max-height:300px;
-}
-.log-title {
-  font-size:0.7rem;
-  font-weight:900;
-  letter-spacing:0.14em;
-  text-transform:uppercase;
-  color:var(--text-muted);
-  margin-bottom:0.5rem;
-}
-.log-list {
-  flex:1;
-  overflow-y:auto;
-  display:flex;
-  flex-direction:column;
-  gap:0.3rem;
-}
-.log-item {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:0.5rem;
-  padding:0.32rem 0.55rem;
   border-radius:var(--radius-sm);
-  background:var(--panel);
+}
+.score-log-table {
+  width:100%;
+  min-width:720px;
+  border-collapse:collapse;
   font-size:0.72rem;
-  font-weight:700;
-  color:var(--text-secondary);
 }
-.log-label {
-  font-weight:800;
-  color:var(--text-primary);
-  letter-spacing:0.05em;
-}
-.log-value {
-  font-family:var(--font-num);
-  font-weight:900;
-  font-size:0.85rem;
-  font-variant-numeric:tabular-nums;
+.score-log-table th,
+.score-log-table td {
+  padding:0.65rem 0.75rem;
+  border-bottom:1px solid var(--border);
+  text-align:left;
   white-space:nowrap;
 }
-.log-item--blue .log-value { color:var(--blue); }
-.log-item--red .log-value { color:var(--red); }
-.log-item--muted { opacity:0.55; }
-.log-item--flash { animation:logIn 0.28s ease-out; }
-@keyframes logIn { from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)} }
+.score-log-table th {
+  color:var(--text-muted);
+  font-size:0.62rem;
+  font-weight:900;
+  letter-spacing:0.08em;
+}
+.score-log-table tbody tr:last-child td { border-bottom:0; }
+.score-log-table td:nth-child(5),
+.score-log-table td:nth-child(6) {
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.score-log-table .score-log-points { font-weight:900; }
+.score-log-empty td { color:var(--text-muted); text-align:center; }
+.score-log-table-wrap:focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
 
 /* ---- durasi modal ---- */
 .dur-inputs {
@@ -565,7 +544,7 @@
 
 .page-dewan .judge-monitor.panel,
 .page-dewan .verify-panel.panel,
-.page-dewan .log-panel {
+.page-dewan .score-log-panel {
   background:var(--panel);
   box-shadow:none;
 }

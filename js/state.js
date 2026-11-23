@@ -67,7 +67,8 @@
 
   function ensureBracketsState(state) {
     if (!state) return state;
-    if (!state.brackets || typeof state.brackets !== "object") {
+    var hasBracketMap = !!(state.brackets && typeof state.brackets === "object");
+    if (!hasBracketMap) {
       state.brackets = {};
     }
     var classes = ["A", "B", "C", "D", "E", "F", "G"];
@@ -84,12 +85,12 @@
     if (classes.indexOf(state.activeBracketClass) === -1) {
       state.activeBracketClass = "A";
     }
-    // backward compatibility
-    if ((!state.brackets[state.activeBracketClass] || !state.brackets[state.activeBracketClass].rounds || !state.brackets[state.activeBracketClass].rounds.length) && state.bracket) {
+    if (!hasBracketMap && state.bracket) {
       try {
         state.brackets[state.activeBracketClass] = sanitizeBracket(state.bracket, sanitizeParticipants(state.bracket.participants));
       } catch (e) {}
     }
+    state.bracket = state.brackets[state.activeBracketClass];
     return state;
   }
 
@@ -481,8 +482,6 @@
 
   function deriveScore(team) {
     var pos =
-      (team.binaan1 || 0) * 1 +
-      (team.binaan2 || 0) * 2 +
       (team.falls || 0) * 3 +
       (team.punches || 0) * 1 +
       (team.kicks || 0) * 2;
@@ -762,8 +761,8 @@
 
   function applyBonus(teamKey, type) {
     var mapping = {
-      binaan1: { counter: "binaan1", value: 1, label: "BINAAN 1", kind: "binaan1" },
-      binaan2: { counter: "binaan2", value: 2, label: "BINAAN 2", kind: "binaan2" },
+      binaan1: { counter: "binaan1", value: 0, label: "BINAAN 1", kind: "binaan1" },
+      binaan2: { counter: "binaan2", value: 0, label: "BINAAN 2", kind: "binaan2" },
       jatuhan: { counter: "falls", value: 3, label: "JATUHAN", kind: "jatuhan" }
     };
     var m = mapping[type];
@@ -984,6 +983,15 @@
       }
       if (payload.rounds !== undefined) ev.rounds = Math.min(9, Math.max(1, toInt(payload.rounds, ev.rounds)));
       if (payload.schedule !== undefined) ev.schedule = sanitizeOptionalText(payload.schedule, ev.schedule);
+      var matchingClass = (s.classes || []).filter(function (c) {
+        return c.name.toLowerCase() === ev.category.toLowerCase();
+      })[0];
+      s.activeClassId = matchingClass ? matchingClass.id : "";
+      var bracketClass = /\bKELAS\s+([A-G])\b/i.exec(ev.category);
+      if (bracketClass) {
+        s.activeBracketClass = bracketClass[1].toUpperCase();
+        ensureBracketsState(s);
+      }
       s.teamBlue.name = ev.blueName;
       s.teamBlue.contingent = ev.blueContingent;
       s.teamRed.name = ev.redName;
@@ -1201,16 +1209,22 @@
 
   function generateBracket(payload) {
     updateState(function (s) {
-      s.bracket = s.bracket || emptyBracket();
+      ensureBracketsState(s);
+      var cls = s.activeBracketClass || "A";
+      s.brackets[cls] = s.brackets[cls] || emptyBracket();
+      s.bracket = s.brackets[cls];
       if (payload) {
         if (payload.title !== undefined) s.bracket.title = sanitizeText(payload.title, s.bracket.title);
         if (payload.category !== undefined) s.bracket.category = sanitizeOptionalText(payload.category, "");
       }
+      if (!s.bracket.title) s.bracket.title = "BAGAN PERTANDINGAN - KELAS " + cls;
+      if (!s.bracket.category) s.bracket.category = "KELAS " + cls;
       s.bracket.participants.forEach(function (p, i) { p.seed = i + 1; });
       s.bracket.rounds = buildBracketRounds(s.bracket.participants);
       s.bracket.activeMatchId = "";
       s.bracket.updatedAt = Date.now();
       recomputeBracket(s.bracket);
+      s.brackets[cls] = s.bracket;
     });
   }
 
@@ -1324,7 +1338,9 @@
         maxWeight: toIntAtSign(payload.maxWeight, 0),
         at: Date.now()
       });
-      s.activeClassId = s.classes[s.classes.length - 1].id;
+      if (name.toLowerCase() === s.event.category.toLowerCase()) {
+        s.activeClassId = s.classes[s.classes.length - 1].id;
+      }
     });
     return true;
   }
@@ -1332,7 +1348,12 @@
   function removeClass(id) {
     updateState(function (s) {
       s.classes = (s.classes || []).filter(function (c) { return c.id !== id; });
-      if (s.activeClassId === id) s.activeClassId = s.classes.length ? s.classes[0].id : "";
+      if (s.activeClassId === id) {
+        var current = s.classes.filter(function (c) {
+          return c.name.toLowerCase() === s.event.category.toLowerCase();
+        })[0];
+        s.activeClassId = current ? current.id : "";
+      }
     });
   }
 
@@ -1489,20 +1510,23 @@
       addScore: function (teamKey, amount) {
         updateState(function (s) {
           var team = teamBy(s, teamKey);
-          team[amount >= 0 ? "binaan1" : "teguran1"] = team[amount >= 0 ? "binaan1" : "teguran1"] + 1;
+          var isBinaan = amount >= 0;
+          var label = isBinaan ? "BINAAN" : "TEGURAN";
+          var value = isBinaan ? 0 : amount;
+          team[isBinaan ? "binaan1" : "teguran1"] += 1;
           pushLog(s, {
             team: teamKey,
             round: s.round,
-            label: "NILAI " + (amount >= 0 ? "+" : "") + amount,
-            value: amount,
+            label: label,
+            value: value,
             source: "dewan",
             at: Date.now()
           });
           pushTimeline(s, {
             team: teamKey,
-            kind: "score",
-            label: "NILAI " + (amount >= 0 ? "+" : "") + amount,
-            value: amount,
+            kind: isBinaan ? "binaan1" : "teguran1",
+            label: label,
+            value: value,
             round: s.round
           });
         });

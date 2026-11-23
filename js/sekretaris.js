@@ -18,8 +18,7 @@
       "headEventName", "headStatus", "headTimer", "ctrlTimer",
       "fEventName", "fMatch", "fSchedule", "fCategory",
       "fBlueName", "fRedName", "fBlueContingent", "fRedContingent",
-      "fBlueLogo", "fRedLogo", "fBlueContingentLogo", "fRedContingentLogo",
-      "pvBlueLogo", "pvRedLogo", "pvBlueContingentLogo", "pvRedContingentLogo",
+
       "fDurMin", "fDurSec", "fRounds",
       "btnSave", "btnStart", "btnExport", "importFile",
       "btnCsvTemplate", "csvFile", "btnBlueWinner", "btnRedWinner", "btnDrawWinner",
@@ -55,7 +54,6 @@
     el.fDurMin.value = Math.floor(ev.roundDuration / 60);
     el.fDurSec.value = ev.roundDuration % 60;
     el.fRounds.value = ev.rounds;
-    renderLogoPreviews(State.getState());
   }
 
   function readForm() {
@@ -117,22 +115,6 @@
       });
     });
 
-    bindLogoInput("fBlueLogo", "blueLogo");
-    bindLogoInput("fRedLogo", "redLogo");
-    bindLogoInput("fBlueContingentLogo", "blueContingentLogo");
-    bindLogoInput("fRedContingentLogo", "redContingentLogo");
-
-    global.IPSI.Utils.qsa("[data-clear-logo]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var field = btn.getAttribute("data-clear-logo");
-        var payload = {};
-        payload[field] = "";
-        State.actions.saveEvent(payload);
-        renderLogoPreviews(State.getState());
-        U.toast("LOGO DIHAPUS", "info");
-      });
-    });
-
     if (el.btnAddClass) el.btnAddClass.addEventListener("click", addClassFromForm);
 
     if (el.btnExport) el.btnExport.addEventListener("click", exportJSON);
@@ -169,45 +151,6 @@
     });
 
     if (el.importFile) el.importFile.addEventListener("change", onImport);
-  }
-
-  function bindLogoInput(inputId, field) {
-    var input = el[inputId];
-    if (!input) return;
-    input.addEventListener("change", function () {
-      var file = input.files && input.files[0];
-      if (!file) return;
-      U.readImageFile(file, 256).then(function (dataUrl) {
-        var payload = {};
-        payload[field] = dataUrl;
-        State.actions.saveEvent(payload);
-        renderLogoPreviews(State.getState());
-        U.toast("LOGO BERHASIL DIMUAT", "success");
-      }).catch(function (err) {
-        U.toast(err && err.message ? err.message : "LOGO GAGAL DIMUAT", "error");
-      }).then(function () {
-        input.value = "";
-      });
-    });
-  }
-
-  function renderLogoPreviews(state) {
-    var ev = state.event;
-    setImage(el.pvBlueLogo, ev.blueLogo);
-    setImage(el.pvRedLogo, ev.redLogo);
-    setImage(el.pvBlueContingentLogo, ev.blueContingentLogo);
-    setImage(el.pvRedContingentLogo, ev.redContingentLogo);
-  }
-
-  function setImage(node, src) {
-    if (!node) return;
-    if (src) {
-      node.src = src;
-      node.classList.add("has-image");
-    } else {
-      node.removeAttribute("src");
-      node.classList.remove("has-image");
-    }
   }
 
   function addClassFromForm() {
@@ -410,15 +353,9 @@
       info.appendChild(meta);
       var actions = document.createElement("div");
       actions.className = "class-item-actions";
-      var use = document.createElement("button");
-      use.type = "button";
-      use.className = "btn btn-primary btn-sm";
-      use.textContent = state.activeClassId === cls.id ? "AKTIF" : "PAKAI";
-      use.addEventListener("click", function () {
-        State.actions.applyClass(cls.id);
-        if (el.fCategory) el.fCategory.value = cls.name;
-        U.toast("KELAS DIPAKAI: " + cls.name, "success");
-      });
+      var active = document.createElement("span");
+      active.className = "class-item-status";
+      active.textContent = state.activeClassId === cls.id ? "SEDANG BERTANDING" : "MENUNGGU";
       var del = document.createElement("button");
       del.type = "button";
       del.className = "btn btn-ghost btn-sm";
@@ -427,7 +364,7 @@
         State.actions.removeClass(cls.id);
         U.toast("KELAS DIHAPUS", "info");
       });
-      actions.appendChild(use);
+      actions.appendChild(active);
       actions.appendChild(del);
       row.appendChild(info);
       row.appendChild(actions);

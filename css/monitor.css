@@ -122,7 +122,15 @@
   font-weight:900;
   letter-spacing:0.06em;
   color:var(--text-secondary);
+  display:inline-flex;
+  min-height:1.15rem;
+  align-items:center;
+  justify-content:center;
 }
+.board-penalties .ipsi-icon { width:1.05rem; height:1.05rem; }
+.board-penalties [data-score-icon="binaan"] { color:var(--blue-bright); }
+.board-penalties [data-score-icon="teguran"] { color:var(--gold-bright); }
+.board-penalties [data-score-icon="peringatan"] { color:var(--red-bright); }
 .board--blue .board-penalties span { border-color:rgba(62,199,255,0.3); }
 .board--red .board-penalties span { border-color:rgba(255,59,84,0.3); }
 .board-score {

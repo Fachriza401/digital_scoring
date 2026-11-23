@@ -6,6 +6,9 @@
   var realtimeChannel = null;
   var realtimeAvailable = false;
   var available = false;
+  var judgePresenceListeners = [];
+  var requestedJudgePresence = "";
+  var presenceInterval = null;
 
   function init() {
     try {
@@ -19,6 +22,7 @@
     }
 
     global.addEventListener("storage", onStorageEvent);
+    if (!presenceInterval) presenceInterval = global.setInterval(publishJudgePresence, 4000);
 
     initSupabaseRealtime();
   }
@@ -35,8 +39,13 @@
           global.IPSI.State.applyRemote(message.payload.state, { source: "supabase" });
         }
       });
+      realtimeChannel.on("presence", { event: "sync" }, publishJudgePresence);
+      realtimeChannel.on("presence", { event: "join" }, publishJudgePresence);
+      realtimeChannel.on("presence", { event: "leave" }, publishJudgePresence);
       realtimeChannel.subscribe(function (status) {
         realtimeAvailable = status === "SUBSCRIBED";
+        if (realtimeAvailable && requestedJudgePresence) trackRequestedJudgePresence();
+        publishJudgePresence();
         try {
           global.dispatchEvent(new CustomEvent("ipsi-sync-status", { detail: { online: realtimeAvailable } }));
         } catch (e) {}
@@ -54,6 +63,10 @@
   }
 
   function onStorageEvent(event) {
+    if (event.key && event.key.indexOf("ipsi_judge_presence_") === 0) {
+      publishJudgePresence();
+      return;
+    }
     if (event.key !== global.IPSI.State.STORAGE_KEY || !event.newValue) return;
     try {
       global.IPSI.State.applyRemote(JSON.parse(event.newValue), { source: "storage" });
@@ -74,6 +87,76 @@
     return available || realtimeAvailable;
   }
 
+  function getJudgePresence() {
+    var presence = {};
+    if (realtimeAvailable && realtimeChannel) {
+      var state = realtimeChannel.presenceState();
+      Object.keys(state).forEach(function (key) {
+        (state[key] || []).forEach(function (metadata) {
+          if (metadata && ["judge1", "judge2", "judge3"].indexOf(metadata.judge) !== -1) {
+            presence[metadata.judge] = true;
+          }
+        });
+      });
+    }
+    var now = Date.now();
+    ["judge1", "judge2", "judge3"].forEach(function (judge) {
+      try {
+        var timestamp = Number(global.localStorage.getItem("ipsi_judge_presence_" + judge));
+        if (timestamp > 0 && timestamp <= now && now - timestamp < 12000) presence[judge] = true;
+      } catch (e) {}
+    });
+    return presence;
+  }
+
+  function publishJudgePresence() {
+    var presence = getJudgePresence();
+    judgePresenceListeners.slice().forEach(function (listener) {
+      listener(presence);
+    });
+  }
+
+  function trackRequestedJudgePresence() {
+    if (!realtimeAvailable || !realtimeChannel || !requestedJudgePresence) return Promise.resolve(false);
+    return realtimeChannel.track({ judge: requestedJudgePresence }).then(function () {
+      publishJudgePresence();
+      return true;
+    }).catch(function (error) {
+      if (global.console) global.console.error("Gagal memperbarui status koneksi juri.", error);
+      return false;
+    });
+  }
+
+  function setJudgePresence(judge, online) {
+    if (online && ["judge1", "judge2", "judge3"].indexOf(judge) === -1) {
+      return Promise.reject(new Error("Identitas juri tidak valid."));
+    }
+    requestedJudgePresence = online ? judge : "";
+    if (online) {
+      return trackRequestedJudgePresence();
+    }
+    if (realtimeAvailable && realtimeChannel) {
+      return realtimeChannel.untrack().then(function () {
+        publishJudgePresence();
+        return true;
+      }).catch(function (error) {
+        if (global.console) global.console.error("Gagal mengakhiri status koneksi juri.", error);
+        throw error;
+      });
+    }
+    publishJudgePresence();
+    return Promise.resolve(false);
+  }
+
+  function subscribeToJudgePresence(listener) {
+    judgePresenceListeners.push(listener);
+    listener(getJudgePresence());
+    return function () {
+      var index = judgePresenceListeners.indexOf(listener);
+      if (index !== -1) judgePresenceListeners.splice(index, 1);
+    };
+  }
+
   global.IPSI = global.IPSI || {};
   global.IPSI.Sync = {
     init: init,
@@ -82,6 +165,8 @@
     subscribeToState: function (fn) {
       return global.IPSI.State.subscribe(fn);
     },
+    setJudgePresence: setJudgePresence,
+    subscribeToJudgePresence: subscribeToJudgePresence,
     syncState: function () {
       global.IPSI.State.loadState();
       global.IPSI.State.saveState();

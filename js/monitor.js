@@ -29,6 +29,7 @@
       "recapRoundScore", "recapWinner", "btnCloseRecap"
     ]);
 
+    renderPenaltyIcons();
     if (el.btnCloseRecap) el.btnCloseRecap.addEventListener("click", hideRecap);
 
     State.subscribe(render);
@@ -42,6 +43,19 @@
     setInterval(updateClock, 1000);
 
     wireAutoHide();
+  }
+
+  function renderPenaltyIcons() {
+    var labels = {
+      binaan: "Binaan",
+      teguran: "Teguran",
+      peringatan: "Peringatan"
+    };
+    Array.prototype.forEach.call(document.querySelectorAll("[data-score-icon]"), function (node) {
+      var type = node.getAttribute("data-score-icon");
+      if (!labels[type] || !global.IPSI.Icons) return;
+      node.appendChild(global.IPSI.Icons.create(type, labels[type]));
+    });
   }
 
   function render(state) {

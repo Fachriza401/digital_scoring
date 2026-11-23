@@ -23,6 +23,33 @@
       return;
     }
     if (State.getState().judgeActive !== authenticatedJudge) State.actions.setJudge(authenticatedJudge);
+    function markLocalPresence() {
+      try {
+        global.localStorage.setItem("ipsi_judge_presence_" + authenticatedJudge, String(Date.now()));
+      } catch (error) {
+        if (global.console) global.console.error("Gagal memperbarui status juri lokal.", error);
+      }
+    }
+    function updateRealtimePresence(online) {
+      var sync = global.IPSI.Sync;
+      if (!sync || typeof sync.setJudgePresence !== "function") return;
+      sync.setJudgePresence(authenticatedJudge, online).catch(function (error) {
+        if (global.console) global.console.error("Gagal memperbarui status koneksi juri.", error);
+      });
+    }
+    markLocalPresence();
+    updateRealtimePresence(true);
+    var presenceInterval = global.setInterval(markLocalPresence, 4000);
+    global.addEventListener("beforeunload", function () {
+      global.clearInterval(presenceInterval);
+      try {
+        global.localStorage.removeItem("ipsi_judge_presence_" + authenticatedJudge);
+      } catch (error) {
+        if (global.console) global.console.error("Gagal menghapus status juri lokal.", error);
+      }
+      updateRealtimePresence(false);
+    });
+
     grab([
       "miEventName", "miMatchLine", "miRoundLabel", "miStatus", "miTimer", "miCategory",
       "activeJudgeLabel", "judgeAthleteLabel",

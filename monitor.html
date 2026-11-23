@@ -58,9 +58,9 @@
             </div>
           </div>
           <div class="board-penalties" aria-label="Rekap binaan dan pelanggaran pesilat biru">
-            <span><b id="miBlueBinaan">0</b><small>BINAAN</small></span>
-            <span><b id="miBlueTeguran">0</b><small>TEGURAN</small></span>
-            <span><b id="miBluePeringatan">0</b><small>PERINGATAN</small></span>
+            <span><b id="miBlueBinaan">0</b><small data-score-icon="binaan"></small></span>
+            <span><b id="miBlueTeguran">0</b><small data-score-icon="teguran"></small></span>
+            <span><b id="miBluePeringatan">0</b><small data-score-icon="peringatan"></small></span>
           </div>
           <div id="miBlueScore" class="board-score" role="status" aria-live="polite">0</div>
           <span id="miBlueDq" class="dq-badge" hidden>DISK</span>
@@ -96,9 +96,9 @@
             </div>
           </div>
           <div class="board-penalties" aria-label="Rekap binaan dan pelanggaran pesilat merah">
-            <span><b id="miRedBinaan">0</b><small>BINAAN</small></span>
-            <span><b id="miRedTeguran">0</b><small>TEGURAN</small></span>
-            <span><b id="miRedPeringatan">0</b><small>PERINGATAN</small></span>
+            <span><b id="miRedBinaan">0</b><small data-score-icon="binaan"></small></span>
+            <span><b id="miRedTeguran">0</b><small data-score-icon="teguran"></small></span>
+            <span><b id="miRedPeringatan">0</b><small data-score-icon="peringatan"></small></span>
           </div>
           <div id="miRedScore" class="board-score" role="status" aria-live="polite">0</div>
           <span id="miRedDq" class="dq-badge" hidden>DISK</span>
@@ -146,6 +146,7 @@
 
   <script src="js/state.js"></script>
   <script src="js/timer.js"></script>
+  <script src="js/icons.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-config.js"></script>
   <script src="js/sync.js"></script>

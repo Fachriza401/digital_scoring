@@ -7,10 +7,11 @@
 
   var el = {};
   var timelineFilter = "all";
+  var judgePresence = {};
 
   var SCORE_CONFIG = [
-    { label: "BINAAN 1", v: "+1", action: "bonus", type: "binaan1", cls: "sb--gold" },
-    { label: "BINAAN 2", v: "+2", action: "bonus", type: "binaan2", cls: "sb--gold" },
+    { label: "BINAAN 1", v: "0", action: "bonus", type: "binaan1", cls: "sb--gold" },
+    { label: "BINAAN 2", v: "0", action: "bonus", type: "binaan2", cls: "sb--gold" },
     { label: "JATUHAN", v: "+3", action: "bonus", type: "jatuhan", cls: "sb--gold" },
     { label: "TEGURAN I", v: "-1", action: "deduct", type: "teguran1", cls: "sb--warning" },
     { label: "TEGURAN II", v: "-2", action: "deduct", type: "teguran2", cls: "sb--warning" },
@@ -34,10 +35,9 @@
       "btnPlay", "btnPause", "btnResetTimer", "btnSetDuration", "btnEmergency", "roundChips",
       "timerBar", "blueScore", "redScore", "blueName", "redName",
       "blueContingent", "redContingent", "blueDq", "redDq",
-      "blueClubLogo", "redClubLogo", "blueContingentLogo", "redContingentLogo",
       "blueFalls", "redFalls", "blueWarnings", "redWarnings",
       "bluePenalties", "redPenalties", "blueButtons", "redButtons",
-      "judgePanels", "blueLog", "redLog",
+      "judgePanels", "incomingScoreLog",
       "btnVerifyFall", "btnVerifyPenalty", "pendingFallBadge", "pendingPenaltyBadge",
       "resetModal", "resetStep1", "resetStep2", "btnResetCancel", "btnResetContinue",
       "btnResetBack", "btnResetConfirm", "resetConfirmText",
@@ -51,6 +51,12 @@
 
     bindControls();
     State.subscribe(render);
+    if (global.IPSI.Sync && global.IPSI.Sync.subscribeToJudgePresence) {
+      global.IPSI.Sync.subscribeToJudgePresence(function (presence) {
+        judgePresence = presence;
+        renderJudges(State.getState());
+      });
+    }
     render(State.getState());
 
     Timer.startTicker(function (remaining) {
@@ -67,12 +73,20 @@
       btn.setAttribute("data-team", teamKey);
       btn.setAttribute("data-action", cfg.action);
       btn.setAttribute("data-type", cfg.type);
-      if (cfg.action === "disk") btn.setAttribute("aria-label", "Diskualifikasi sudut " + teamKey);
-      else if (cfg.action === "bonus") btn.setAttribute("aria-label", cfg.label + " " + cfg.v + " " + teamKey);
-      else btn.setAttribute("aria-label", cfg.label + " " + cfg.v + " " + teamKey);
+      var teamLabel = teamKey === "blue" ? "BIRU" : "MERAH";
+      if (cfg.action === "disk") btn.setAttribute("aria-label", "DISKUALIFIKASI SUDUT " + teamLabel);
+      else btn.setAttribute("aria-label", cfg.label + " " + cfg.v + " SUDUT " + teamLabel);
       var label = document.createElement("span");
       label.className = "sb-label";
-      label.textContent = cfg.label;
+      var category = null;
+      if (/binaan/i.test(cfg.type)) category = "binaan";
+      else if (/teguran/i.test(cfg.type)) category = "teguran";
+      else if (/peringatan/i.test(cfg.type)) category = "peringatan";
+      if (category && global.IPSI && global.IPSI.Icons && typeof global.IPSI.Icons.create === "function") {
+        label.appendChild(global.IPSI.Icons.create(category, cfg.label + ", " + cfg.v + " poin"));
+      } else {
+        label.textContent = cfg.label;
+      }
       var value = document.createElement("span");
       value.className = "v";
       value.textContent = cfg.v;
@@ -288,17 +302,6 @@
     el.btnEmergency.setAttribute("aria-pressed", active ? "true" : "false");
   }
 
-  function setLogo(node, src) {
-    if (!node) return;
-    if (src) {
-      node.src = src;
-      node.classList.add("has-image");
-    } else {
-      node.removeAttribute("src");
-      node.classList.remove("has-image");
-    }
-  }
-
   function renderHeader(state) {
     var ev = state.event;
     if (el.miEventName) el.miEventName.textContent = ev.name;
@@ -343,7 +346,6 @@
   function renderTeam(team, teamKey) {
     var panel = document.querySelector(".team-panel--" + teamKey);
     if (panel) panel.classList.toggle("is-disqualified", team.disqualified);
-    var state = State.getState();
     if (teamKey === "blue") {
       if (el.blueName) {
         el.blueName.textContent = team.name;
@@ -355,8 +357,6 @@
       if (el.blueFalls) el.blueFalls.textContent = team.falls;
       if (el.blueWarnings) el.blueWarnings.textContent = Number(team.teguran1 || 0) + Number(team.teguran2 || 0) + Number(team.teguran3 || 0);
       if (el.bluePenalties) el.bluePenalties.textContent = Number(team.peringatan1 || 0) + Number(team.peringatan2 || 0) + Number(team.peringatan3 || 0);
-      setLogo(el.blueClubLogo, state.event.blueLogo);
-      setLogo(el.blueContingentLogo, state.event.blueContingentLogo);
       setDisabled(el.blueButtons, team.disqualified);
     } else {
       if (el.redName) {
@@ -369,8 +369,6 @@
       if (el.redFalls) el.redFalls.textContent = team.falls;
       if (el.redWarnings) el.redWarnings.textContent = Number(team.teguran1 || 0) + Number(team.teguran2 || 0) + Number(team.teguran3 || 0);
       if (el.redPenalties) el.redPenalties.textContent = Number(team.peringatan1 || 0) + Number(team.peringatan2 || 0) + Number(team.peringatan3 || 0);
-      setLogo(el.redClubLogo, state.event.redLogo);
-      setLogo(el.redContingentLogo, state.event.redContingentLogo);
       setDisabled(el.redButtons, team.disqualified);
     }
   }
@@ -400,8 +398,8 @@
       id.className = "judge-id";
       id.textContent = "JURI " + key.replace("judge", "");
       var active = document.createElement("span");
-      active.className = "status-pill status-" + (state.judgeActive === key ? "running" : "ready");
-      active.textContent = state.judgeActive === key ? "AKTIF" : "PASIF";
+      active.className = "status-pill status-" + (judgePresence[key] ? "running" : "paused");
+      active.textContent = judgePresence[key] ? "AKTIF" : "TIDAK AKTIF";
       head.appendChild(id);
       head.appendChild(active);
       card.appendChild(head);
@@ -425,33 +423,46 @@
   }
 
   function renderLogs(state) {
-    renderLogList(state.logs, "blue", el.blueLog);
-    renderLogList(state.logs, "red", el.redLog);
-  }
-
-  function renderLogList(incoming, teamKey, root) {
+    var root = el.incomingScoreLog;
     if (!root) return;
-    var list = incoming.filter(function (item) { return item.team === teamKey; }).slice(-40).reverse();
+    var list = (state.logs || []).filter(function (item) {
+      return item.source === "juri" || /^(BINAAN|JATUHAN|TEGURAN|PERINGATAN)/i.test(item.label || "");
+    }).slice(-120).reverse();
     root.innerHTML = "";
-    list.forEach(function (item, idx) {
-      var row = document.createElement("div");
-      row.className = "log-item log-item--" + teamKey + (idx === 0 ? " log-item--flash" : "");
-      var label = document.createElement("span");
-      label.className = "log-label";
-      label.textContent = "B" + item.round + " - " + item.label;
-      var value = document.createElement("span");
-      value.className = "log-value";
-      value.textContent = formatLogValue(item.value, item.label);
-      row.appendChild(label);
-      row.appendChild(value);
+    list.forEach(function (item) {
+      var row = document.createElement("tr");
+      var timeCell = document.createElement("td");
+      var time = document.createElement("time");
+      time.dateTime = new Date(item.at || Date.now()).toISOString();
+      time.textContent = formatTime(item.at);
+      timeCell.appendChild(time);
+      var judgeCell = document.createElement("td");
+      var judge = /JURI\s+(\d+)/i.exec(item.label || "");
+      judgeCell.textContent = judge ? "JURI " + judge[1] : item.source === "juri" ? "JURI" : "DEWAN";
+      var sideCell = document.createElement("td");
+      sideCell.textContent = item.team === "blue" ? "BIRU" : item.team === "red" ? "MERAH" : "-";
+      var labelCell = document.createElement("td");
+      labelCell.textContent = String(item.label || "").replace(/\s*\(JURI\s+\d+\)/i, "");
+      var valueCell = document.createElement("td");
+      valueCell.className = "score-log-points";
+      valueCell.textContent = formatLogValue(item.value, item.label || "");
+      var roundCell = document.createElement("td");
+      roundCell.textContent = "BABAK " + (item.round || 1);
+      row.appendChild(timeCell);
+      row.appendChild(judgeCell);
+      row.appendChild(sideCell);
+      row.appendChild(labelCell);
+      row.appendChild(valueCell);
+      row.appendChild(roundCell);
       root.appendChild(row);
     });
     if (!list.length) {
-      var empty = document.createElement("div");
-      empty.className = "log-item log-item--muted";
-      var emptyLabel = document.createElement("span");
-      emptyLabel.textContent = "Belum ada nilai masuk";
-      empty.appendChild(emptyLabel);
+      var empty = document.createElement("tr");
+      empty.className = "score-log-empty";
+      var message = document.createElement("td");
+      message.colSpan = 6;
+      message.textContent = "Belum ada nilai masuk.";
+      empty.appendChild(message);
       root.appendChild(empty);
     }
   }
